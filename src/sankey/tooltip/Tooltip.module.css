@@ -1,0 +1,24 @@
+.SankeyTooltip {
+  position: fixed;
+  padding: 10px;
+  width: max-content;
+  border: 1px solid rgb(204, 204, 204);
+  background: var(--light-highlighted-bg) !important;
+  color: var(--color-scale-black);
+  transition: 0.5s;
+  z-index: var(--z-index-highest);
+  line-height: 2;
+  pointer-events: none;
+}
+
+.SankeyValueTooltip {
+  color: var(--primary-text-color);
+}
+
+.SankeyOutgoingTooltip {
+  color: var(--chart-decrementColor);
+}
+
+.SankeyIncomeTooltip {
+  color: var(--chart-incrementColor);
+}
