@@ -1,8 +1,7 @@
 import React from 'react'
 
-import { constants } from '../constants'
+import { constants, defaultSettings } from '../constants'
 
-import styles from './Tooltip.module.css'
 import {  Link, Node, NumberFormat, SankeyNodeTooltipType } from '../types'
 import { numberFormat } from '../../utils/utils'
 import { SankeyLink } from 'd3-sankey'
@@ -13,6 +12,7 @@ interface Props {
     isShow: SankeyNodeTooltipType
     values: string
     value?: number
+    color?: string
 }
 
 export const NodeTargets: React.FC<Props> = React.memo(function NodeTargets({
@@ -21,6 +21,7 @@ export const NodeTargets: React.FC<Props> = React.memo(function NodeTargets({
     isShow,
     values,
     value = 0,
+    color = defaultSettings.tooltipColors.decrementColor
 }) {
     const { outgoingName, outgoingValue, outgoingPercentage } = isShow
     const needShow = outgoingName || outgoingValue || outgoingPercentage
@@ -46,8 +47,8 @@ export const NodeTargets: React.FC<Props> = React.memo(function NodeTargets({
 
         return (
             <div
-                className={styles.SankeyOutgoingTooltip}
                 key={nameText}
+                style={{color}}
             >
                 {text}
             </div>

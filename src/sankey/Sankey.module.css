@@ -5,7 +5,7 @@
 }
 
 .Node {
-  stroke: var(--primary-text-color);
+  stroke: #212121;
   stroke-opacity: 0.5;
   stroke-width: 1px;
 }
@@ -16,6 +16,5 @@
 }
 
 .NodeLabel {
-  fill: var(--primary-text-color);
   pointer-events: none;
 }

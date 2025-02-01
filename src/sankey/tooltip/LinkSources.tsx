@@ -1,7 +1,6 @@
 import React from 'react'
 import round from 'lodash/round'
 
-
 import { constants } from '../constants'
 import { CustomSankeyNode, SankeyLinkTooltipType } from '../types'
 
@@ -11,20 +10,15 @@ interface Props {
     isShow: SankeyLinkTooltipType
 }
 
-export const LinkSources: React.FC<Props> = React.memo(function LinkSources({
-    source,
-    target,
-    isShow,
-}) {
-    const { name: sourceName, value: sourceValue, color: sourceColor } = source as CustomSankeyNode
-    const { name: targetName, value: targetValue, color: targetColor } = target as CustomSankeyNode
-    const { sourceName: needSourceName, sourcePercentage, linkName, linkPercentage } = isShow
-
-    const sourceLinkValue = sourceValue / targetValue
-    const targetLinkValue = targetValue / sourceValue
-
-    const sourceText = getText(needSourceName, sourceName, sourcePercentage, sourceLinkValue)
-    const targetText = getText(linkName, targetName, linkPercentage, targetLinkValue)
+export const LinkSources: React.FC<Props> = React.memo(function LinkSources(props) {
+    const  {
+        sourceName,
+        sourceColor,
+        sourceText,
+        targetName,
+        targetColor,
+        targetText,
+    } = getParams(props)
 
     return (
         <React.Fragment>
@@ -51,4 +45,29 @@ function getText(needName: boolean, name: string, needPercentage: boolean, value
     const separate = needName && needPercentage ? constants.TOOLTIP_SEPARATE : ''
 
     return `${nameText}${separate}${percentage}`
+}
+
+function getParams({
+    source,
+    target,
+    isShow,
+}: Props) {
+    const { name: sourceName, value: sourceValue, color: sourceColor } = source as CustomSankeyNode
+    const { name: targetName, value: targetValue, color: targetColor } = target as CustomSankeyNode
+    const { sourceName: needSourceName, sourcePercentage, linkName, linkPercentage } = isShow
+
+    const sourceLinkValue = sourceValue / targetValue
+    const targetLinkValue = targetValue / sourceValue
+
+    const sourceText = getText(needSourceName, sourceName, sourcePercentage, sourceLinkValue)
+    const targetText = getText(linkName, targetName, linkPercentage, targetLinkValue)
+
+    return {
+        sourceName,
+        sourceColor,
+        sourceText,
+        targetName,
+        targetColor,
+        targetText,
+    }
 }

@@ -2,6 +2,7 @@
 import globals from 'globals'
 // import reactHooks from 'eslint-plugin-react-hooks'
 import tsEslint from 'typescript-eslint'
+// import prettier from 'prettier/prettier'
 
 export default [
     {
@@ -9,6 +10,7 @@ export default [
         ignores: ['dist', 'node_modules', "**/*.config.js", "tsconfig.json"],
         plugins: {
             '@typescript-eslint': tsEslint,
+            // 'prettier/prettier': prettier,
         },
         languageOptions: {
             ecmaVersion: 'latest',
@@ -31,8 +33,8 @@ export default [
             // '@typescript-eslint/explicit-function-return-type': 'warn', // Напоминание о возвращаемом типе
             // '@typescript-eslint/no-explicit-any': 'error', // Запрет использования `any`
             'quotes': ['error', 'single'], // Использование одинарных кавычек
-            'semi': 'off',
-    
+            'semi': ['error', 'never'],
+            // 'prettier/prettier': ['error', { printWidth: 100 }],
             'linebreak-style': ['error', 'unix'], // LF перенос строк
             'max-len': ['error', { code: 100, ignoreUrls: true }], // Длина строки 100 символов
             'indent': ['error', 4, { SwitchCase: 1 }], // Отступы 4 пробела

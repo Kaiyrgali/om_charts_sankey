@@ -1,18 +1,18 @@
 import React from 'react'
 
-import { constants } from '../constants'
+import { constants, defaultSettings } from '../constants'
 
-import styles from './Tooltip.module.css'
 import { Link, Node, NumberFormat, SankeyNodeTooltipType } from '../types'
 import { numberFormat } from '../../utils/utils'
 import { SankeyLink } from 'd3-sankey'
 
 interface Props {
-    links: SankeyLink<Node, Link>[] | undefined
+    links: SankeyLink<Node, Link>[] | undefined | undefined
     format: NumberFormat
     isShow: SankeyNodeTooltipType
     values: string
     value?: number
+    color?: string
 }
 
 export const NodeSources: React.FC<Props> = React.memo(function NodeSources({
@@ -21,6 +21,7 @@ export const NodeSources: React.FC<Props> = React.memo(function NodeSources({
     isShow,
     values,
     value = 0,
+    color = defaultSettings.tooltipColors.incrementColor
 }) {
     const { incomeName, incomeValue, incomePercentage } = isShow
     const needShow = incomeName || incomeValue || incomePercentage
@@ -46,8 +47,8 @@ export const NodeSources: React.FC<Props> = React.memo(function NodeSources({
 
         return (
             <div
-                className={styles.SankeyIncomeTooltip}
                 key={nameText}
+                style={{color}}
             >
                 {text}
             </div>

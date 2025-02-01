@@ -3,22 +3,13 @@
   padding: 10px;
   width: max-content;
   border: 1px solid rgb(204, 204, 204);
-  background: var(--light-highlighted-bg) !important;
-  color: var(--color-scale-black);
+  /* var(--light-highlighted-bg) */
+  background: #f6f6f6 !important;
+  /* var(--color-scale-black) */
+  color: #010409; 
   transition: 0.5s;
-  z-index: var(--z-index-highest);
+  /* var(--z-index-highest) */
+  z-index: 300;
   line-height: 2;
   pointer-events: none;
-}
-
-.SankeyValueTooltip {
-  color: var(--primary-text-color);
-}
-
-.SankeyOutgoingTooltip {
-  color: var(--chart-decrementColor);
-}
-
-.SankeyIncomeTooltip {
-  color: var(--chart-incrementColor);
 }

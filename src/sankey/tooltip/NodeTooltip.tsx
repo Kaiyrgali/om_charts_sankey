@@ -5,14 +5,16 @@ import { NodeSources } from './NodeSources'
 import { NodeTargets } from './NodeTargets'
 import { NodeValue } from './NodeValue'
 import { TooltipContainer } from './TooltipContainer'
+import { defaultSettings } from '../constants'
 
 export const SankeyChartNodeTooltip: React.FC<TooltipProps> = props => {
     const {
         params: { data, position, type },
-        showTooltip,
+        showTooltip = defaultSettings.showNodeTooltip,
         chartRef,
-        digitCapacity: { values },
+        digitCapacity: { values } = defaultSettings.digitCapacityValue,
         format,
+        colors = defaultSettings.tooltipColors
     } = props
     const needTooltip = useMemo(() => Object.values(showTooltip).find(show => show), [showTooltip])
 
@@ -49,7 +51,7 @@ export const SankeyChartNodeTooltip: React.FC<TooltipProps> = props => {
         >
             <NodeValue
                 color={color}
-                format={format}
+                format={format!}
                 isShow={showTooltip as SankeyNodeTooltipType}
                 name={name}
                 value={value}
@@ -57,19 +59,21 @@ export const SankeyChartNodeTooltip: React.FC<TooltipProps> = props => {
             />
 
             <NodeSources
-                format={format}
+                format={format!}
                 isShow={showTooltip as SankeyNodeTooltipType}
                 links={targetLinks}
                 value={value}
                 values={values}
+                color={colors?.incrementColor}
             />
 
             <NodeTargets
-                format={format}
+                format={format!}
                 isShow={showTooltip as SankeyNodeTooltipType}
                 links={sourceLinks}
                 value={value}
                 values={values}
+                color={colors?.decrementColor}
             />
         </TooltipContainer>
     )

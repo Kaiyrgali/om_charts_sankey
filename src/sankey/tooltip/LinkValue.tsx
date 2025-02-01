@@ -1,17 +1,17 @@
 import React from 'react'
 
-import styles from './Tooltip.module.css'
 import { Languages, NumberFormat } from '../types'
 
-import { constants } from '../constants'
 import { numberFormat } from '../../utils/utils'
+import { constants, defaultSettings } from '../constants'
 
 interface Props {
     value: number
     format: NumberFormat
-        values: string
+    values: string
     isShow: boolean
-        lang?: Languages
+    lang?: Languages
+    color?: string
 }
 
 export const LinkValue: React.FC<Props> = React.memo(function LinkValue({
@@ -20,6 +20,7 @@ export const LinkValue: React.FC<Props> = React.memo(function LinkValue({
     values,
     isShow,
     lang = Languages.RU,
+    color = defaultSettings.tooltipColors.linkText
 }) {
     if (!isShow) {
         return null
@@ -27,8 +28,6 @@ export const LinkValue: React.FC<Props> = React.memo(function LinkValue({
 
     const formattedValue = numberFormat(format, value, values)
     const linkText = `${constants.valueLabel[lang]}: ${formattedValue}`
-    // TODO надо реализовать lang from 'global/helpers'
-    // const linkText = `Значение: ${formattedValue}`
 
-    return <div className={styles.SankeyValueTooltip}>{linkText}</div>
+    return <div style={{color}}>{linkText}</div>
 })

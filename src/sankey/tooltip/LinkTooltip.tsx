@@ -5,14 +5,16 @@ import { Link, SankeyLinkTooltipType, SankeyTypeTooltip, TooltipProps } from '..
 import { LinkSources } from './LinkSources'
 import { LinkValue } from './LinkValue'
 import { TooltipContainer } from './TooltipContainer'
+import { defaultSettings } from '../constants'
 
 export const SankeyChartLinkTooltip = (props: TooltipProps) => {
     const {
         params: { data, position, type },
-        digitCapacity: { values },
-        showTooltip,
+        digitCapacity: { values } = defaultSettings.digitCapacityValue,
+        showTooltip = defaultSettings.showLinkTooltip,
         format,
         chartRef,
+        colors,
     } = props
     const needTooltip = useMemo(() => Object.values(showTooltip).find(show => show), [showTooltip])
 
@@ -28,10 +30,11 @@ export const SankeyChartLinkTooltip = (props: TooltipProps) => {
             position={position}
         >
             <LinkValue
-                format={format}
+                format={format!}
                 isShow={showTooltip.value}
                 value={value}
                 values={values}
+                color={colors?.linkText}
             />
 
             <LinkSources

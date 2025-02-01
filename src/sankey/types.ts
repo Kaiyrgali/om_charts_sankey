@@ -2,7 +2,6 @@ import { SankeyLinkMinimal, SankeyNodeMinimal, SankeyNode, SankeyLink } from 'd3
 import { BaseType, Selection } from 'd3-selection'
 import { Transition } from 'd3-transition'
 
-
 export type CustomSankeyNode = Node & Required<SankeyNodeMinimal<Node, Link>>
 export type CustomSankeyLink = Link & Required<SankeyLinkMinimal<Node, Link>>
 
@@ -18,7 +17,7 @@ export interface Link {
     value: number
 }
 
-export interface SankeyDatum {
+export interface Datum {
     nodes: Node[]
     links: Link[]
 }
@@ -28,23 +27,31 @@ export enum SankeyTypeTooltip {
     LINK = 'link',
 }
 
-export interface SankeySettings {
-    needTooltip: boolean
-    direction: { source: number; target: number }
-    digitCapacity: { values: DigitalCapacity }
-    valuesFrom?: number
-    format: NumberFormat
-    nodesSortingType: SortingType
-    linksSortingType: SortingType
-    colorMode: string
-    text: {
-        showName: boolean
-        showValue: boolean
-    }
-    nodeAlign: SankeyNodeAlign
-    showNodeTooltip: SankeyNodeTooltipType
-    showLinkTooltip: SankeyLinkTooltipType
+export interface Settings {
+    needTooltip?: boolean
+    digitCapacity?: { values: DigitalCapacity }
+    format?: NumberFormat
+    nodesSortingType?: SortingType
+    linksSortingType?: SortingType
+    colorMode?: ColorMode
+    text?: Text
+    nodeAlign?: NodeAlign
+    showNodeTooltip?: SankeyNodeTooltipType
+    showLinkTooltip?: SankeyLinkTooltipType
     lang?: Languages
+    tooltipColors?: TooltipColors
+}
+
+export interface Text {
+    showName: boolean
+    showValue: boolean
+}
+
+interface TooltipColors {
+    labels: string
+    linkText: string
+    decrementColor: string
+    incrementColor: string
 }
 
 export enum Languages {
@@ -54,13 +61,13 @@ export enum Languages {
     TR = 'tr',
 }
 
-export enum SankeyNodeAlign {
+export enum NodeAlign {
     LEFT = 'sankeyLeft',
     RIGHT = 'sankeyRight',
     CENTER = 'sankeyCenter',
     JUSTIFY = 'sankeyJustify',
 }
-export enum SankeyDirection {
+export enum ColorMode {
     SOURCE = 'source',
     TARGET = 'target',
 }
@@ -103,10 +110,11 @@ export interface TooltipState {
 
 export interface TooltipProps {
     chartRef: React.RefObject<SVGSVGElement>
-    format: NumberFormat
-    digitCapacity: { values: string }
+    format?: NumberFormat
+    digitCapacity?: { values: string }
     params: TooltipState
-    showTooltip: SankeyNodeTooltipType | SankeyLinkTooltipType
+    showTooltip?: SankeyNodeTooltipType | SankeyLinkTooltipType
+    colors?: TooltipColors 
 }
 
 export type SankeyNodeTooltipType = {
@@ -138,5 +146,9 @@ export enum DigitalCapacity {
     MEGA = 'MEGA',
 }
 
-export type SortingType = 'withoutSorting' | 'ascending' | 'descending'
+export const enum SortingType {
+    NONE = 'withoutSorting',
+    ASC = 'ascending',
+    DESC = 'descending',
+}
 

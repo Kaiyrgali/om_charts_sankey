@@ -1,4 +1,4 @@
-import { SankeyDatum } from "./types";
+import { Datum } from "../sankey/types";
 
 export const chartData = {
     "nodes": [
@@ -200,4 +200,4 @@ export const chartData = {
             "value": 1100
         }
     ]
-} as SankeyDatum
+} as Datum

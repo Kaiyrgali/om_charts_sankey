@@ -6,21 +6,21 @@ import map from 'lodash/map'
 import assign from 'lodash/assign'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 
-import { constants } from './constants'
+import { constants, defaultSettings } from './constants'
 import { SankeyChartLinkTooltip } from './tooltip/LinkTooltip'
 import { SankeyChartNodeTooltip } from './tooltip/NodeTooltip'
 import { createSankeyGenerator, getText, hasInvalidDatum } from '../utils/utils'
 import {
     CustomSankeyNode,
-    SankeyDatum,
+    Datum,
     Node,
-    SankeySettings,
+    Settings,
     SankeyTypeTooltip,
     RectSelection,
     NodeSelection,
     LinkSelection,
     PathSelection,
-    SankeyDirection,
+    ColorMode,
     LabelSelection,
     TextSelection,
     SVG,
@@ -28,13 +28,13 @@ import {
     Link,
 } from './types'
 
-import styles from './SankeyChart.module.css'
+import styles from './Sankey.module.css'
 
 interface Props {
-    datum: SankeyDatum
+    datum: Datum
     width: number
     height: number
-    settings: SankeySettings
+    settings: Settings
 }
 
 const { HOVER_OPACITY, NORMAL_OPACITY, ANIMATION_FAST } = constants
@@ -125,7 +125,7 @@ export const Sankey = ({
                 .attr('d', sankeyLinkHorizontal())
                 .attr('class', styles.Link)
                 .attr('stroke', ({ source, target }) => {
-                    return settings.colorMode === SankeyDirection.SOURCE
+                    return settings.colorMode === ColorMode.SOURCE
                         ? (source as Node).color
                         : (target as Node).color
                 })
@@ -135,11 +135,17 @@ export const Sankey = ({
         const applyTextAttributes = (selection: LabelSelection) => {
             ;(selection as TextSelection)
                 .attr('class', styles.NodeLabel)
+                .attr('fill', settings.tooltipColors?.labels || defaultSettings.tooltipColors.labels)
                 .attr('x', ({ x0 = 0, x1 = 0 }) => (x0 < width / 2 ? x1 + 6 : x0 - 6))
                 .attr('y', ({ y0 = 0, y1 = 0 }) => (y1 + y0) / 2)
                 .attr('dy', '0.35em')
                 .attr('text-anchor', ({ x0 = 0 }) => (x0 < width / 2 ? 'start' : 'end'))
-                .text(data => getText(data, settings.text, settings.digitCapacity, settings.format))
+                .text(data => getText(
+                    data,
+                    settings.text || defaultSettings.text,
+                    settings.digitCapacity || defaultSettings.digitCapacityValue,
+                    settings.format || defaultSettings.format
+                ))
         }
 
         const rect = svg
@@ -198,22 +204,22 @@ export const Sankey = ({
                     function (
                         this: BaseType | SVGPathElement,
                         currentLink: SankeyLink<Node, Link>
-                    ): (t: number) => string {
+                    ): (_time: number) => string {
                         const isConnected =
-                            currentLink.source === data || currentLink.target === data;
+                            currentLink.source === data || currentLink.target === data
                         const startOpacity =
                             parseFloat((this as SVGPathElement)?.style.strokeOpacity) ||
-                            NORMAL_OPACITY;
+                            NORMAL_OPACITY
                         const endOpacity = isConnected
                             ? HOVER_OPACITY
-                            : NORMAL_OPACITY;
+                            : NORMAL_OPACITY
             
-                        return function (t: number): string {
-                            return interpolateNumber(startOpacity, endOpacity)(t).toString();
-                        };
+                        return function (_time: number): string {
+                            return interpolateNumber(startOpacity, endOpacity)(_time).toString()
+                        }
                     }
                 )
-            })
+        })
             .on('mousemove', event => {
                 if (settings.needTooltip) {
                     setTooltipState(prev => ({
@@ -302,6 +308,7 @@ export const Sankey = ({
                 format={settings.format}
                 params={tooltipState}
                 showTooltip={settings.showNodeTooltip}
+                colors={settings.tooltipColors}
             />
 
             <SankeyChartLinkTooltip
@@ -310,6 +317,7 @@ export const Sankey = ({
                 format={settings.format}
                 params={tooltipState}
                 showTooltip={settings.showLinkTooltip}
+                colors={settings.tooltipColors}
             />
         </React.Fragment>
     )

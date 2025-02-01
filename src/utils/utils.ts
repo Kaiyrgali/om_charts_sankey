@@ -3,22 +3,23 @@ import { sankey, sankeyCenter, sankeyJustify, sankeyLeft, SankeyNode, sankeyRigh
 // import isNumber from 'lodash/isNumber'
 // import round from 'lodash/round'
 
-import { constants } from '../sankey/constants'
+import { constants, defaultSettings } from '../sankey/constants'
 import {
-    SankeyDatum,
+    Datum,
     Link,
     Node,
-    SankeyNodeAlign,
-    SankeySettings,
+    NodeAlign,
     SortingNode,
     SortingLink,
     SortingType,
+    Text,
+    DigitalCapacity,
     // DigitalCapacity,
 } from '../sankey/types'
 import { NumberFormat } from '../sankey/types'
 
-function getNodeAlign(value: SankeyNodeAlign) {
-    const { CENTER, LEFT, RIGHT } = SankeyNodeAlign
+function getNodeAlign(value: NodeAlign) {
+    const { CENTER, LEFT, RIGHT } = NodeAlign
 
     switch (value) {
         case CENTER:
@@ -33,9 +34,9 @@ function getNodeAlign(value: SankeyNodeAlign) {
 }
 
 export const createSankeyGenerator = (
-    nodesSortingType: SortingType = 'withoutSorting',
-    linksSortingType: SortingType = 'withoutSorting',
-    nodeAlign = SankeyNodeAlign.JUSTIFY,
+    nodesSortingType: SortingType = defaultSettings.nodesSortingType,
+    linksSortingType: SortingType = defaultSettings.linksSortingType,
+    nodeAlign: NodeAlign = defaultSettings.nodeAlign,
     cardWidth: number,
     cardHeight: number,
 ) => {
@@ -57,15 +58,15 @@ export const createSankeyGenerator = (
         .linkSort(SORTING[linksSortingType] as SortingLink)
 }
 
-export const hasInvalidDatum = ({ links, nodes }: SankeyDatum) => {
+export const hasInvalidDatum = ({ links, nodes }: Datum) => {
     return !links?.length || !nodes?.length
 }
 
 export const getText = (
     { name, value = 0 }: SankeyNode<Node, Link>,
-    { showName, showValue }: SankeySettings['text'],
-    { values }: SankeySettings['digitCapacity'],
-    format: SankeySettings['format'],
+    { showName, showValue }: Text,
+    { values }:  {values: DigitalCapacity},
+    format: NumberFormat,
 ) => {
     if (!showName && !showValue) {
         return ''
