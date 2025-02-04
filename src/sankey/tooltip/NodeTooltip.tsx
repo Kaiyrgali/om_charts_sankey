@@ -1,11 +1,12 @@
 import React, { useMemo } from 'react'
-
+import some from 'lodash/some'
 import { CustomSankeyNode, SankeyNodeTooltipType, SankeyTypeTooltip, TooltipProps } from '../types'
 import { NodeSources } from './NodeSources'
 import { NodeTargets } from './NodeTargets'
 import { NodeValue } from './NodeValue'
 import { TooltipContainer } from './TooltipContainer'
 import { defaultSettings } from '../constants'
+import { needSkipTooltip } from '../../utils/utils'
 
 export const SankeyChartNodeTooltip: React.FC<TooltipProps> = props => {
     const {
@@ -14,35 +15,16 @@ export const SankeyChartNodeTooltip: React.FC<TooltipProps> = props => {
         chartRef,
         digitCapacity: { values } = defaultSettings.digitCapacityValue,
         format,
-        colors = defaultSettings.tooltipColors
+        colors,
     } = props
-    const needTooltip = useMemo(() => Object.values(showTooltip).find(show => show), [showTooltip])
+    const needTooltip = useMemo(() => some(showTooltip), [showTooltip])
+    const isNode = type === SankeyTypeTooltip.NODE
 
-    if (type !== SankeyTypeTooltip.NODE) {
+    if (!isNode || !needTooltip || needSkipTooltip(data, showTooltip as SankeyNodeTooltipType)) {
         return null
     }
 
     const { name, value, sourceLinks, targetLinks, color } = data as CustomSankeyNode
-    const {
-        name: showName,
-        value: showValue,
-        incomeName,
-        incomeValue,
-        incomePercentage,
-        outgoingName,
-        outgoingValue,
-        outgoingPercentage,
-    } = showTooltip as SankeyNodeTooltipType
-    const skipSourceTooltip =
-        !targetLinks?.length &&
-        !(showName || showValue || outgoingName || outgoingValue || outgoingPercentage)
-    const skipTargetTooltip =
-        !sourceLinks?.length &&
-        !(showName || showValue || incomeName || incomeValue || incomePercentage)
-
-    if (!needTooltip || skipSourceTooltip || skipTargetTooltip) {
-        return null
-    }
 
     return (
         <TooltipContainer

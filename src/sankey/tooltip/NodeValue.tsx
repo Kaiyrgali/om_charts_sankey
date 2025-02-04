@@ -1,8 +1,7 @@
 import React from 'react'
 
-import { constants } from '../constants'
 import { NumberFormat, SankeyNodeTooltipType } from '../types'
-import { numberFormat } from '../../utils/utils'
+import { getNodeValueParams } from '../../utils/utils'
 
 interface Props {
     format: NumberFormat
@@ -18,14 +17,10 @@ export const NodeValue: React.FC<Props> = React.memo(function NodeValue({
     values,
     color,
     name,
-    value = 0,
-    isShow: { name: isShowName, value: isShowValue },
+    isShow,
+    value,
 }) {
-    const nameText = isShowName ? name : ''
-    const valueText = isShowValue ? numberFormat(format, value, values) : ''
-    const separate = isShowName && isShowValue ? constants.TOOLTIP_SEPARATE : ''
-
-    const nodeText = `${nameText}${separate}${valueText}`
+    const nodeText = getNodeValueParams(format, values, name, isShow, value)
 
     return <div style={{ color }}>{nodeText}</div>
 })

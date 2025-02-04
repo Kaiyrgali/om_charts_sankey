@@ -13,3 +13,18 @@
   line-height: 2;
   pointer-events: none;
 }
+
+.SankeyValueTooltip {
+    /* var(--primary-text-color) */
+    color: #212121;
+}
+  
+.SankeyOutgoingTooltip {
+    /* var(--chart-decrementColor) */
+    color: #B22222;
+}
+
+.SankeyIncomeTooltip {
+    /* var(--chart-incrementColor) */
+    color: #228B22;
+}

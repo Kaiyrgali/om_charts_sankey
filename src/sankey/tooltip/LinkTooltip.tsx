@@ -1,6 +1,6 @@
 import { SankeyLinkMinimal } from 'd3-sankey'
 import { useMemo } from 'react'
-
+import some from 'lodash/some'
 import { Link, SankeyLinkTooltipType, SankeyTypeTooltip, TooltipProps } from '../types'
 import { LinkSources } from './LinkSources'
 import { LinkValue } from './LinkValue'
@@ -16,7 +16,7 @@ export const SankeyChartLinkTooltip = (props: TooltipProps) => {
         chartRef,
         colors,
     } = props
-    const needTooltip = useMemo(() => Object.values(showTooltip).find(show => show), [showTooltip])
+    const needTooltip = useMemo(() => some(showTooltip), [showTooltip])
 
     if (type !== SankeyTypeTooltip.LINK || !needTooltip) {
         return null

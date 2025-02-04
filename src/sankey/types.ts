@@ -1,4 +1,11 @@
-import { SankeyLinkMinimal, SankeyNodeMinimal, SankeyNode, SankeyLink } from 'd3-sankey'
+import {
+    SankeyLinkMinimal,
+    SankeyNodeMinimal,
+    SankeyNode,
+    SankeyLink,
+    SankeyLayout,
+    SankeyGraph,
+} from 'd3-sankey'
 import { BaseType, Selection } from 'd3-selection'
 import { Transition } from 'd3-transition'
 
@@ -22,6 +29,7 @@ export interface Datum {
     links: Link[]
 }
 
+// TODO убрать Sankey
 export enum SankeyTypeTooltip {
     NODE = 'node',
     LINK = 'link',
@@ -80,6 +88,13 @@ export type NodeSelection = RectSelection | RectTransition
 
 type PathTransition = Transition<BaseType, SankeyLink<Node, Link>, BaseType, unknown>
 
+export type LinkEventSelection = Selection<
+    BaseType | SVGPathElement,
+    SankeyLink<Node, Link>,
+    SVGSVGElement,
+    unknown
+>
+
 export type PathSelection = Selection<SVGPathElement, SankeyLink<Node, Link>, BaseType, unknown>
 
 export type LinkSelection = PathSelection | PathTransition
@@ -92,6 +107,7 @@ export type LabelSelection = TextSelection | TextTransition
 
 export type SVG = Selection<SVGSVGElement, unknown, null, undefined>
 
+// TODO разобраться с подчеркиванием типов
 export type SortingNode = (
     a: SankeyNode<Node, Link>,
     b: SankeyNode<Node, Link>,
@@ -104,9 +120,11 @@ export type SortingLink = (
 
 export interface TooltipState {
     type: SankeyTypeTooltip | null
-    data: SankeyNode<Node, Link> | (Link & SankeyLinkMinimal<Node, Link>) | null
+    data: DataType
     position: { x: number; y: number } | null
 }
+
+export type DataType = SankeyNode<Node, Link> | (Link & SankeyLinkMinimal<Node, Link>) | null
 
 export interface TooltipProps {
     chartRef: React.RefObject<SVGSVGElement>
@@ -116,6 +134,10 @@ export interface TooltipProps {
     showTooltip?: SankeyNodeTooltipType | SankeyLinkTooltipType
     colors?: TooltipColors 
 }
+
+export type SankeyGenerator = SankeyLayout<SankeyGraph<Node, Link>, Node, Link>
+
+export type LinkSource = string | (string & CustomSankeyNode)
 
 export type SankeyNodeTooltipType = {
     name: boolean
@@ -127,6 +149,7 @@ export type SankeyNodeTooltipType = {
     outgoingValue: boolean
     outgoingPercentage: boolean
 }
+
 export type SankeyLinkTooltipType = {
     value: boolean
     sourceName: boolean

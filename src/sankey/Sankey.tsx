@@ -1,31 +1,28 @@
-import { easeSinOut, interpolateNumber } from 'd3'
-import { SankeyLink, sankeyLinkHorizontal } from 'd3-sankey'
-import { BaseType, select } from 'd3-selection'
+import { easeSinOut } from 'd3'
+import { select } from 'd3-selection'
 import { transition } from 'd3-transition'
-import map from 'lodash/map'
-import assign from 'lodash/assign'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 
-import { constants, defaultSettings } from './constants'
+import { defaultSettings } from './constants'
 import { SankeyChartLinkTooltip } from './tooltip/LinkTooltip'
 import { SankeyChartNodeTooltip } from './tooltip/NodeTooltip'
-import { createSankeyGenerator, getText, hasInvalidDatum } from '../utils/utils'
+import {
+    addSankeyEventListeners,
+    applyLinkAttributes,
+    applyRectAttributes,
+    applyTextAttributes,
+    createSankeyGenerator,
+    destroySankeyEventListeners,
+    getAnimation,
+    getSankeyData,
+    hasInvalidDatum,
+} from '../utils/utils'
 import {
     CustomSankeyNode,
     Datum,
-    Node,
     Settings,
-    SankeyTypeTooltip,
-    RectSelection,
-    NodeSelection,
-    LinkSelection,
-    PathSelection,
-    ColorMode,
-    LabelSelection,
-    TextSelection,
     SVG,
     TooltipState,
-    Link,
 } from './types'
 
 import styles from './Sankey.module.css'
@@ -37,15 +34,22 @@ interface Props {
     settings: Settings
 }
 
-const { HOVER_OPACITY, NORMAL_OPACITY, ANIMATION_FAST } = constants
-
 export const Sankey = ({
     datum,
     width: cardWidth,
     height: cardHeight,
     settings,
 }: Props) => {
-    const { nodesSortingType, linksSortingType, nodeAlign } = settings
+    const {
+        nodesSortingType,
+        linksSortingType,
+        nodeAlign,
+        text = defaultSettings.text,
+        digitCapacity = defaultSettings.digitCapacityValue,
+        format = defaultSettings.format,
+        colorMode,
+        needTooltip = defaultSettings.needTooltip,
+    } = settings
     const sankeyGenerator = useMemo(
         () =>
             createSankeyGenerator(
@@ -59,39 +63,19 @@ export const Sankey = ({
     )
 
     const sankeyData = useMemo(() => {
-        if (hasInvalidDatum(datum)) {
-            return {
-                nodes: [],
-                links: [],
-            }
-        }
-
-        try {
-            return sankeyGenerator({
-                nodes: map(datum.nodes, data => assign({}, data)),
-                links: map(datum.links, data => assign({}, data)),
-            })
-        } catch {
-            return {
-                nodes: [],
-                links: [],
-            }
-        }
+        return getSankeyData(datum, sankeyGenerator)
     }, [datum, sankeyGenerator])
-    console.log('sankeyData', sankeyData)
 
     const [tooltipState, setTooltipState] = useState<TooltipState>({
         type: null,
         data: null,
         position: null,
     })
-    const hoverTransition = () => transition().duration(ANIMATION_FAST)
+
     const svgRef = useRef<SVGSVGElement>(null)
     const prevWidth = useRef(cardWidth)
     const prevHeight = useRef(cardHeight)
-
-    const isChartResized = prevWidth.current !== cardWidth || prevHeight.current !== cardHeight
-    const animation = isChartResized ? 0 : ANIMATION_FAST
+    const animation = getAnimation(prevWidth.current, prevHeight.current, cardWidth, cardHeight)
 
     useEffect(() => {
         const container = svgRef.current
@@ -109,44 +93,6 @@ export const Sankey = ({
         }
 
         const { nodes, links } = sankeyData
-
-        const applyRectAttributes = (selection: NodeSelection) => {
-            ;(selection as RectSelection)
-                .attr('class', styles.Node)
-                .attr('x', ({ x0 = 0 }) => x0)
-                .attr('y', ({ y0 = 0 }) => y0)
-                .attr('width', ({ x0 = 0, x1 = 0 }) => x1 - x0)
-                .attr('height', ({ y0 = 0, y1 = 0 }) => y1 - y0)
-                .attr('fill', data => data.color)
-        }
-
-        const applyLinkAttributes = (selection: LinkSelection) => {
-            ;(selection as PathSelection)
-                .attr('d', sankeyLinkHorizontal())
-                .attr('class', styles.Link)
-                .attr('stroke', ({ source, target }) => {
-                    return settings.colorMode === ColorMode.SOURCE
-                        ? (source as Node).color
-                        : (target as Node).color
-                })
-                .attr('stroke-width', ({ width: linkWidth = 0 }) => Math.max(1, linkWidth))
-        }
-
-        const applyTextAttributes = (selection: LabelSelection) => {
-            ;(selection as TextSelection)
-                .attr('class', styles.NodeLabel)
-                .attr('fill', settings.tooltipColors?.labels || defaultSettings.tooltipColors.labels)
-                .attr('x', ({ x0 = 0, x1 = 0 }) => (x0 < width / 2 ? x1 + 6 : x0 - 6))
-                .attr('y', ({ y0 = 0, y1 = 0 }) => (y1 + y0) / 2)
-                .attr('dy', '0.35em')
-                .attr('text-anchor', ({ x0 = 0 }) => (x0 < width / 2 ? 'start' : 'end'))
-                .text(data => getText(
-                    data,
-                    settings.text || defaultSettings.text,
-                    settings.digitCapacity || defaultSettings.digitCapacityValue,
-                    settings.format || defaultSettings.format
-                ))
-        }
 
         const rect = svg
             .selectAll<SVGRectElement, CustomSankeyNode>('rect')
@@ -166,12 +112,16 @@ export const Sankey = ({
             .selectAll('path')
             .data(links)
             .join(
-                enter => enter.append('path').call(applyLinkAttributes),
+                enter => enter
+                    .append('path')
+                    .call(selection => applyLinkAttributes(selection, colorMode)),
                 update =>
                     update.call(currentSelection => {
                         currentSelection
                             .transition(transition().duration(animation))
-                            .call(applyLinkAttributes)
+                            .call(currentSelection =>
+                                applyLinkAttributes(currentSelection, colorMode)
+                            )
                     }),
                 exit => exit.remove,
             )
@@ -179,104 +129,31 @@ export const Sankey = ({
         svg.selectAll('text')
             .data(nodes)
             .join(
-                enter => enter.append('text').call(applyTextAttributes),
+                enter => enter.append('text').call(selection =>
+                    applyTextAttributes(selection, width, text, digitCapacity, format),),
                 update =>
                     update.call(currentSelection => {
                         currentSelection
                             .transition(transition().duration(animation).ease(easeSinOut))
-                            .call(applyTextAttributes)
+                            .call(currentSelection =>
+                                applyTextAttributes(
+                                    currentSelection,
+                                    width,
+                                    text,
+                                    digitCapacity,
+                                    format,
+                                ),)
                     }),
                 exit => exit.remove,
             )
 
-        rect.on('mouseenter', (event, data) => {
-            if (settings.needTooltip) {
-                setTooltipState({
-                    data,
-                    type: SankeyTypeTooltip.NODE,
-                    position: { x: event.pageX, y: event.pageY },
-                })
-            }
-
-            link.transition(hoverTransition())
-                .styleTween(
-                    'stroke-opacity',
-                    function (
-                        this: BaseType | SVGPathElement,
-                        currentLink: SankeyLink<Node, Link>
-                    ): (_time: number) => string {
-                        const isConnected =
-                            currentLink.source === data || currentLink.target === data
-                        const startOpacity =
-                            parseFloat((this as SVGPathElement)?.style.strokeOpacity) ||
-                            NORMAL_OPACITY
-                        const endOpacity = isConnected
-                            ? HOVER_OPACITY
-                            : NORMAL_OPACITY
-            
-                        return function (_time: number): string {
-                            return interpolateNumber(startOpacity, endOpacity)(_time).toString()
-                        }
-                    }
-                )
-        })
-            .on('mousemove', event => {
-                if (settings.needTooltip) {
-                    setTooltipState(prev => ({
-                        ...prev,
-                        position: { x: event.pageX, y: event.pageY },
-                    }))
-                }
-            })
-            .on('mouseleave', () => {
-                link.transition(hoverTransition()).style('stroke-opacity', NORMAL_OPACITY)
-
-                if (settings.needTooltip) {
-                    setTooltipState(prev => ({
-                        ...prev,
-                        type: null,
-                        position: null,
-                    }))
-                }
-            })
-
-        link.on('mouseenter', function (event, data) {
-            if (settings.needTooltip) {
-                setTooltipState({
-                    data,
-                    type: SankeyTypeTooltip.LINK,
-                    position: { x: event.pageX, y: event.pageY },
-                })
-            }
-
-            select(this).transition(hoverTransition()).style('stroke-opacity', HOVER_OPACITY)
-        })
-            .on('mousemove', event => {
-                if (settings.needTooltip) {
-                    setTooltipState(prev => ({
-                        ...prev,
-                        position: { x: event.pageX, y: event.pageY },
-                    }))
-                }
-            })
-            .on('mouseleave', function () {
-                if (settings.needTooltip) {
-                    setTooltipState(prev => ({
-                        ...prev,
-                        type: null,
-                        position: null,
-                    }))
-                }
-
-                select(this).transition(hoverTransition()).style('stroke-opacity', NORMAL_OPACITY)
-            })
+        addSankeyEventListeners(rect, link, setTooltipState, needTooltip)
 
         prevWidth.current = cardWidth
         prevHeight.current = cardHeight
 
         return () => {
-            rect.on('mouseenter', null).on('mousemove', null).on('mouseleave', null)
-            link.on('mouseenter', null).on('mousemove', null).on('mouseleave', null)
+            destroySankeyEventListeners(rect, link)
             setTooltipState({ type: null, data: null, position: null })
         }
     }, [

@@ -25,6 +25,9 @@ export const constants = {
     },
     HOVER_OPACITY: 0.8,
     NORMAL_OPACITY: 0.5,
+    TEXT_OFFSET: 6,
+    START: 'start',
+    END: 'end',
     // TODO выделить в глобальные константы
     PERCENTAGE: 'PERCENTAGE',
     valueLabel: {
@@ -70,8 +73,7 @@ export const defaultSettings = {
     }, // возможно это не нужно
     tooltipColors: {
         labels: '#212121', // var(--primary-text-color)
-        linkText: '#212121', // var(--primary-text-color)
-        decrementColor: '#B22222', //  var(--chart-decrementColor)
-        incrementColor: '#228B22' //  var(--chart-incrementColor)
-    }
+    },
+    height: 500,
+    width: 900,
 } as const

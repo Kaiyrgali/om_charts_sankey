@@ -3,7 +3,9 @@ import React from 'react'
 import { Languages, NumberFormat } from '../types'
 
 import { numberFormat } from '../../utils/utils'
-import { constants, defaultSettings } from '../constants'
+import { constants } from '../constants'
+
+import styles from './Tooltip.module.css'
 
 interface Props {
     value: number
@@ -20,7 +22,7 @@ export const LinkValue: React.FC<Props> = React.memo(function LinkValue({
     values,
     isShow,
     lang = Languages.RU,
-    color = defaultSettings.tooltipColors.linkText
+    color,
 }) {
     if (!isShow) {
         return null
@@ -29,5 +31,12 @@ export const LinkValue: React.FC<Props> = React.memo(function LinkValue({
     const formattedValue = numberFormat(format, value, values)
     const linkText = `${constants.valueLabel[lang]}: ${formattedValue}`
 
-    return <div style={{color}}>{linkText}</div>
+    return (
+        <div
+            className={styles.SankeyValueTooltip}
+            style={{color}}
+        >
+            {linkText}
+        </div>
+    )
 })
