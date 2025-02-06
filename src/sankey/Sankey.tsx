@@ -38,7 +38,7 @@ export const Sankey = ({
     width: cardWidth,
     height: cardHeight,
     settings,
-}: Props) => {
+}: Props): JSX.Element | null => {
     const {
         nodesSortingType,
         linksSortingType,
@@ -151,7 +151,7 @@ export const Sankey = ({
         prevWidth.current = cardWidth
         prevHeight.current = cardHeight
 
-        return () => {
+        return (): void => {
             abortController.abort()
             setTooltipState({ type: null, data: null, position: null })
         }

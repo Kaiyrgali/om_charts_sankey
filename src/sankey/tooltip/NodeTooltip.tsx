@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import some from 'lodash/some'
-import { CustomSankeyNode, SankeyNodeTooltipType, SankeyTypeTooltip, TooltipProps } from '../types'
+import { CustomSankeyNode, SankeyNodeTooltipType, TooltipType, TooltipProps } from '../types'
 import { NodeSources } from './NodeSources'
 import { NodeTargets } from './NodeTargets'
 import { NodeValue } from './NodeValue'
@@ -17,7 +17,7 @@ export const SankeyChartNodeTooltip: React.FC<TooltipProps> = props => {
         colors,
     } = props
     const needTooltip = useMemo(() => some(showTooltip), [showTooltip])
-    const isNode = type === SankeyTypeTooltip.NODE
+    const isNode = type === TooltipType.NODE
 
     if (!isNode || !needTooltip || needSkipTooltip(data, showTooltip as SankeyNodeTooltipType)) {
         return null

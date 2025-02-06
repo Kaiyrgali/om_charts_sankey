@@ -1,13 +1,14 @@
+import React from 'react'
 import { SankeyLinkMinimal } from 'd3-sankey'
 import { useMemo } from 'react'
 import some from 'lodash/some'
-import { Link, SankeyLinkTooltipType, SankeyTypeTooltip, TooltipProps } from '../types'
+import { Link, SankeyLinkTooltipType, TooltipType, TooltipProps } from '../types'
 import { LinkSources } from './LinkSources'
 import { LinkValue } from './LinkValue'
 import { TooltipContainer } from './TooltipContainer'
 import { defaultSettings } from '../constants'
 
-export const SankeyChartLinkTooltip = (props: TooltipProps) => {
+export const SankeyChartLinkTooltip = (props: TooltipProps): React.ReactElement | null => {
     const {
         params: { data, position, type },
         showTooltip = defaultSettings.showLinkTooltip,
@@ -17,7 +18,7 @@ export const SankeyChartLinkTooltip = (props: TooltipProps) => {
     } = props
     const needTooltip = useMemo(() => some(showTooltip), [showTooltip])
 
-    if (type !== SankeyTypeTooltip.LINK || !needTooltip) {
+    if (type !== TooltipType.LINK || !needTooltip) {
         return null
     }
 

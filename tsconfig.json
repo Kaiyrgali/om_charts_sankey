@@ -13,6 +13,8 @@
       "moduleResolution": "bundler", 
       "allowImportingTsExtensions": true,
       "esModuleInterop": true,
+      "forceConsistentCasingInFileNames": true, // ✅ Предотвращает ошибки при разных регистрах
+    
       "isolatedModules": true,
       "moduleDetection": "force",
       "noEmit": true,
@@ -24,6 +26,7 @@
       "noUnusedLocals": true,
       "noUnusedParameters": true,
       "noFallthroughCasesInSwitch": true,
+      "noUncheckedIndexedAccess": true, // ✅ Добавляет защиту при работе с массивами/объектами
       "noUncheckedSideEffectImports": true,
     },
     "include": ["src"],

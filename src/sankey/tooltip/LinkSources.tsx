@@ -10,7 +10,7 @@ export interface Props {
 }
 
 export const LinkSources: React.FC<Props> = React.memo(function LinkSources(props) {
-    const  {
+    const {
         sourceName,
         sourceColor,
         sourceText,

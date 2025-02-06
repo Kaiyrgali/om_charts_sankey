@@ -11,13 +11,13 @@ interface Props {
     value?: number
 }
 
-export const NodeValue: React.FC<Props> = React.memo(function NodeValue({
+export const NodeValue = React.memo(function NodeValue({
     color,
     name,
     isShow,
     value,
     numberFormatter,
-}) {
+}: Props) {
     const nodeText = getNodeValueParams(name, isShow, value, numberFormatter)
 
     return <div style={{ color }}>{nodeText}</div>

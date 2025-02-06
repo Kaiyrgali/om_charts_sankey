@@ -2,6 +2,18 @@
     "printWidth": 100,
     "tabWidth": 4,
     "useTabs": false,
-    "semi": false,
-    // "prettier/prettier": ["error", { "printWidth": 100 }]
-  }
+    "semi": false, 
+    "singleQuote": true,
+    "trailingComma": "none",
+    "arrowParens": "avoid",
+    "endOfLine": "lf",
+    "overrides": [
+        {
+            "files": "*.ts",
+            "options": {
+                "bracketSpacing": true,
+                "singleAttributePerLine": false // ✅ Отключает разрывы строк в интерфейсах
+            }
+        }
+    ] 
+}

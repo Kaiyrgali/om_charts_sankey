@@ -1,83 +1,53 @@
-// import js from '@eslint/js'
 import globals from 'globals'
-// import reactHooks from 'eslint-plugin-react-hooks'
-import tsEslint from 'typescript-eslint'
-// import prettier from 'prettier/prettier'
+import pluginJs from "@eslint/js";
+import tsEslint from "typescript-eslint";
+import pluginReact  from "eslint-plugin-react";
+import pluginPrettier from "eslint-plugin-prettier";
 
 export default [
+    pluginJs.configs.recommended,
+    ...tsEslint.configs.recommended,
     {
         files: ["src/**/*.{ts,tsx}"],
-        ignores: ['dist', 'node_modules', "**/*.config.js", "tsconfig.json"],
-        plugins: {
-            '@typescript-eslint': tsEslint,
-            // 'prettier/prettier': prettier,
-        },
+        ignores: ['dist', 'node_modules', 'src/test/*', "**/*.config.js", "tsconfig.json"],
         languageOptions: {
+            parser: tsEslint.parser,
             ecmaVersion: 'latest',
             sourceType: 'module',
             globals: globals.browser,
-            parser: tsEslint.parser,
+            parserOptions: {
+                ecmaFeatures: {
+                  jsx: true,
+                },
+              },
         },
-        "rules": {
-            // React Hooks Rules
-            // ...reactHooks.configs.recommended.rules,
-          
-            // React Refresh Rules
-            // 'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
-          
-            // Общие правила
-            'no-unused-vars': ['error', { argsIgnorePattern: '^_' }], // Предупреждения для неиспользуемых переменных
-    
-            // 'react/jsx-uses-react': 'error',
-            // 'react/jsx-uses-vars': 'error',
-            // '@typescript-eslint/explicit-function-return-type': 'warn', // Напоминание о возвращаемом типе
-            // '@typescript-eslint/no-explicit-any': 'error', // Запрет использования `any`
-            'quotes': ['error', 'single'], // Использование одинарных кавычек
+        plugins: {
+            react: pluginReact,
+            prettier: pluginPrettier,
+        },
+        settings: {
+            react: {
+                version: "detect",
+            }
+        },
+        rules: {
+            ...pluginReact.configs.recommended.rules,
             'semi': ['error', 'never'],
-            // 'prettier/prettier': ['error', { printWidth: 100 }],
-            'linebreak-style': ['error', 'unix'], // LF перенос строк
-            'max-len': ['error', { code: 100, ignoreUrls: true }], // Длина строки 100 символов
-            'indent': ['error', 4, { SwitchCase: 1 }], // Отступы 4 пробела
-            'no-warning-comments': ['warn', { terms: ['todo', 'fixme'], location: 'start' }], // Не игнорировать TODO
-            // 'jsx-a11y/anchor-has-content': 'error' // Форматирование атрибутов в JSX
+            "prefer-const": "error",
+            'react/jsx-uses-react': 'error',
+            'react/jsx-uses-vars': 'error',
+            '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+            '@typescript-eslint/explicit-function-return-type': 'warn',
+            '@typescript-eslint/no-explicit-any': 'error',
+            'quotes': ['error', 'single'],
+            'linebreak-style': ['error', 'unix'],
+            'max-len': ['error', { code: 100, ignoreUrls: true }],
+            'indent': ['error', 4, { SwitchCase: 1 }],
+            'no-warning-comments': ['warn', { terms: ['todo', 'fixme'], location: 'start' }],
+            "no-multi-spaces": ["error", {
+                "exceptions": { "Property": true, "ImportAttribute": true }
+            }],
+            "key-spacing": ["error", { "beforeColon": false, "afterColon": true }]
         }
     },
 ]
-//  
-
-//     extends: [
-//         js.configs.recommended,
-//         ...tseslint.configs.recommended, // ✅ Это подтянет все настройки TypeScript
-//         'plugin:react/recommended',
-//     ],
-//     files: ['**/*.{ts,tsx}'],
-
-//     plugins: [
-//         'react',
-//         'react-hooks',
-//         'react-refresh',
-//     ],
-//     rules: {
-//         // React Hooks Rules
-//         ...reactHooks.configs.recommended.rules,
-      
-//         // React Refresh Rules
-//         'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
-      
-//         // Общие правила
-//         'no-unused-vars': ['error', { argsIgnorePattern: '^_' }], // Предупреждения для неиспользуемых переменных
-
-//         'react/jsx-uses-react': 'error',
-//         'react/jsx-uses-vars': 'error',
-//         '@typescript-eslint/explicit-function-return-type': 'warn', // Напоминание о возвращаемом типе
-//         '@typescript-eslint/no-explicit-any': 'error', // Запрет использования `any`
-//         'quotes': ['error', 'single'], // Использование одинарных кавычек
-
-//         'linebreak-style': ['error', 'unix'], // LF перенос строк
-//         'max-len': ['error', { code: 100, ignoreUrls: true }], // Длина строки 100 символов
-//         'indent': ['error', 4, { SwitchCase: 1 }], // Отступы 4 пробела
-//         'no-warning-comments': ['warn', { terms: ['todo', 'fixme'], location: 'start' }], // Не игнорировать TODO
-//         'jsx-a11y/anchor-has-content': 'error' // Форматирование атрибутов в JSX
-//       },
-//   },
-// )

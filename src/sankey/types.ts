@@ -29,8 +29,7 @@ export interface Datum {
     links: Link[]
 }
 
-// TODO убрать Sankey
-export enum SankeyTypeTooltip {
+export enum TooltipType {
     NODE = 'node',
     LINK = 'link',
 }
@@ -108,7 +107,6 @@ export type LabelSelection = TextSelection | TextTransition
 
 export type SVG = Selection<SVGSVGElement, unknown, null, undefined>
 
-// TODO разобраться с подчеркиванием типов
 export type SortingNode = (
     a: SankeyNode<Node, Link>,
     b: SankeyNode<Node, Link>,
@@ -120,7 +118,7 @@ export type SortingLink = (
 ) => number | null | undefined
 
 export interface TooltipState {
-    type: SankeyTypeTooltip | null
+    type: TooltipType | null
     data: DataType
     position: { x: number; y: number } | null
 }

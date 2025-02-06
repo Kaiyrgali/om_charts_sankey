@@ -3,6 +3,7 @@ import {
     sankeyCenter,
     SankeyGraph,
     sankeyJustify,
+    SankeyLayout,
     sankeyLeft,
     SankeyLink,
     sankeyLinkHorizontal,
@@ -33,7 +34,7 @@ import {
     DataType,
     LinkEventSelection,
     TooltipState,
-    SankeyTypeTooltip,
+    TooltipType,
     NumberFormatter,
 } from '../sankey/types'
 import { Props as LinkSourcesProps } from '../sankey/tooltip/LinkSources'
@@ -45,9 +46,9 @@ import replace from 'lodash/replace'
 import assign from 'lodash/assign'
 import map from 'lodash/map'
 import round from 'lodash/round'
-import { interpolateNumber, transition } from 'd3'
+import { interpolateNumber, Transition, transition } from 'd3'
 
-function getNodeAlign(value: NodeAlign) {
+function getNodeAlign(value: NodeAlign): (node: SankeyNode<object, object>, n: number) => number {
     const { CENTER, LEFT, RIGHT } = NodeAlign
 
     switch (value) {
@@ -68,7 +69,7 @@ export const createSankeyGenerator = (
     nodeAlign: NodeAlign = defaultSettings.nodeAlign,
     cardWidth: number = defaultSettings.width,
     cardHeight: number = defaultSettings.height,
-) => {
+): SankeyLayout<SankeyGraph<Node, Link>, Node, Link> => {
     const {
         NODE_WIDTH,
         SORTING,
@@ -87,7 +88,7 @@ export const createSankeyGenerator = (
         .linkSort(SORTING[linksSortingType] as SortingLink)
 }
 
-export const hasInvalidDatum = ({ links, nodes }: Datum) => {
+export const hasInvalidDatum = ({ links, nodes }: Datum): boolean => {
     return !links?.length || !nodes?.length
 }
 
@@ -109,7 +110,7 @@ export const getText = (
     return !showName ? formattedValue : `${name} (${formattedValue})`
 }
 
-export const getDataName = (text: string) => {
+export const getDataName = (text: string): string => {
     return replace(text, /[()]/g, '')
 }
 
@@ -123,13 +124,13 @@ export const getAnimation = (
     prevHeightCurrent: number,
     cardWidth: number,
     cardHeight: number,
-) => {
+): number => {
     const isChartResized = prevWidthCurrent !== cardWidth || prevHeightCurrent !== cardHeight
 
     return isChartResized ? 0 : constants.ANIMATION_FAST
 }
 
-export const applyRectAttributes = (selection: NodeSelection) => {
+export const applyRectAttributes = (selection: NodeSelection): void => {
     ;(selection as RectSelection)
         .attr('class', styles.Node)
         .attr('x', ({ x0 = 0 }) => x0)
@@ -139,7 +140,7 @@ export const applyRectAttributes = (selection: NodeSelection) => {
         .attr('fill', data => data.color)
 }
 
-export const applyLinkAttributes = (selection: LinkSelection, colorMode?: string) => {
+export const applyLinkAttributes = (selection: LinkSelection, colorMode?: string): void => {
     ;(selection as PathSelection)
         .attr('d', sankeyLinkHorizontal())
         .attr('class', styles.Link)
@@ -156,7 +157,7 @@ export const applyTextAttributes = (
     width: number,
     text: Text,
     numberFormatter: NumberFormatter,
-) => {
+): void => {
     ;(selection as TextSelection)
         .attr('class', styles.NodeLabel)
         .attr('x', ({ x0 = 0, x1 = 0 }) =>
@@ -195,7 +196,7 @@ export const getLinkSourcesText = (
     name: string,
     needPercentage: boolean,
     value: number,
-) => {
+): string => {
     const nameText = needName ? name : ''
     const percentage = needPercentage ? `${round(value * 100)}%` : ''
     const separate = needName && needPercentage ? constants.TOOLTIP_SEPARATE : ''
@@ -203,7 +204,14 @@ export const getLinkSourcesText = (
     return `${nameText}${separate}${percentage}`
 }
 
-export const getLinkSourcesParams = ({ source, target, isShow }: LinkSourcesProps) => {
+export const getLinkSourcesParams = ({ source, target, isShow }: LinkSourcesProps): {
+    sourceName: string;
+    sourceColor: string;
+    sourceText: string;
+    targetName: string;
+    targetColor: string;
+    targetText: string;
+} => {
     const { name: sourceName, value: sourceValue, color: sourceColor } = source as CustomSankeyNode
     const { name: targetName, value: targetValue, color: targetColor } = target as CustomSankeyNode
     const { sourceName: needSourceName, sourcePercentage, linkName, linkPercentage } = isShow
@@ -232,7 +240,10 @@ export const getLinkSourcesParams = ({ source, target, isShow }: LinkSourcesProp
 export const getNodeSourcesParams = (
     link: SankeyLink<Node, Link>,
     { isShow, value, numberFormatter }: NodeSourcesProps,
-) => {
+): {
+    key: string;
+    text: string;
+} => {
     const { incomeName, incomeValue, incomePercentage } = isShow
     const nameText = getNameText(incomeName, link.source as Node)
     const valueText = getFormattedValue(incomeValue, link.value, numberFormatter)
@@ -248,7 +259,10 @@ export const getNodeSourcesParams = (
 export const getNodeTargetParams = (
     link: SankeyLink<Node, Link>,
     { isShow, value, numberFormatter }: NodeSourcesProps,
-) => {
+): {
+    key: string;
+    text: string;
+} => {
     const { outgoingName, outgoingValue, outgoingPercentage } = isShow
     const nameText = getNameText(outgoingName, link.target as Node)
     const valueText = getFormattedValue(outgoingValue, link.value, numberFormatter)
@@ -261,7 +275,7 @@ export const getNodeTargetParams = (
     }
 }
 
-const getSeparate = (needName: boolean, needValue: boolean) => {
+const getSeparate = (needName: boolean, needValue: boolean): string => {
     return needName && needValue ? constants.TOOLTIP_SEPARATE : ''
 }
 
@@ -269,7 +283,7 @@ const getFormattedValue = (
     needFormat: boolean,
     value: number,
     numberFormatter: NumberFormatter,
-) => {
+): string => {
     return needFormat ? numberFormat(value, numberFormatter) : ''
 }
 
@@ -278,14 +292,14 @@ const getPercentageText = (
     needPercentage: boolean,
     link: SankeyLink<Node, Link>,
     value = 0,
-) => {
+): string => {
     const leftParen = needValue ? '(' : ''
     const rightParen = needValue ? ')' : ''
 
     return needPercentage ? `${leftParen}${round((link.value / value) * 100)}%${rightParen}` : ''
 }
 
-const getNodeKey = (link: Node, index: number) => {
+const getNodeKey = (link: Node, index: number): string => {
     return `${link.name}_${index}`
 }
 
@@ -294,11 +308,11 @@ const getNodeText = (
     separate: string,
     valueText: string,
     percentageText: string,
-) => {
+): string => {
     return `${nameText}${separate}${valueText} ${percentageText}`
 }
 
-const getNameText = (needName: boolean, source: Node) => {
+const getNameText = (needName: boolean, source: Node): string => {
     return needName ? source.name : ''
 }
 
@@ -307,7 +321,7 @@ export const getNodeValueParams = (
     isShow: SankeyNodeTooltipType,
     value = 0,
     numberFormatter: NumberFormatter,
-) => {
+): string => {
     const { name: isShowName, value: isShowValue } = isShow
     const nameText = isShowName ? name : ''
     const valueText = getFormattedValue(isShowValue, value, numberFormatter)
@@ -338,7 +352,8 @@ export const needSkipTooltip = (data: DataType, showTooltip: SankeyNodeTooltipTy
     return skipSourceTooltip || skipTargetTooltip
 }
 
-const hoverTransition = () => transition().duration(constants.ANIMATION_FAST)
+const hoverTransition = ()
+: Transition<BaseType, unknown, null, undefined> => transition().duration(constants.ANIMATION_FAST)
 
 export const addSankeyEventListeners = (
     rect: RectSelection,
@@ -346,7 +361,7 @@ export const addSankeyEventListeners = (
     setTooltipState: React.Dispatch<React.SetStateAction<TooltipState>>,
     needTooltip: boolean,
     signal: AbortSignal,
-) => {
+): void => {
     if (!rect || !link) {
         return
     }
@@ -355,7 +370,7 @@ export const addSankeyEventListeners = (
         if (needTooltip) {
             setTooltipState({
                 data,
-                type: SankeyTypeTooltip.NODE,
+                type: TooltipType.NODE,
                 position: { x: event.pageX, y: event.pageY },
             })
         }
@@ -406,7 +421,7 @@ export const addSankeyEventListeners = (
         if (needTooltip) {
             setTooltipState({
                 data,
-                type: SankeyTypeTooltip.LINK,
+                type: TooltipType.LINK,
                 position: { x: event.pageX, y: event.pageY },
             })
         }
@@ -436,6 +451,6 @@ export const addSankeyEventListeners = (
         }, { signal })
 }
 
-export function numberFormat(value: number, numberFormatter: NumberFormatter) {
+export function numberFormat(value: number, numberFormatter: NumberFormatter): string {
     return numberFormatter ? numberFormatter(value) : `${value}`
 }

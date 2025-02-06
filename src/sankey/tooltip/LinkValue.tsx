@@ -15,13 +15,13 @@ interface Props {
     numberFormatter?: NumberFormatter
 }
 
-export const LinkValue: React.FC<Props> = React.memo(function LinkValue({
+export const LinkValue = React.memo(function LinkValue({
     value,
     numberFormatter,
     isShow,
     lang = Languages.RU,
     color,
-}) {
+}: Props) {
     if (!isShow) {
         return null
     }

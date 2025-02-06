@@ -11,7 +11,10 @@ export function useTooltipCoordinate(
     position: Position,
     tooltipRef: TooltipRef,
     chartRef: ChartRef,
-) {
+): {
+    top: number | undefined;
+    left: number | undefined;
+}[] {
     const [coordinate, setCoordinate] = useState({ top: position?.y, left: position?.x })
 
     useEffect(() => {

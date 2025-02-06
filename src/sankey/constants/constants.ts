@@ -28,7 +28,6 @@ export const constants = {
     TEXT_OFFSET: 6,
     START: 'start',
     END: 'end',
-    // TODO выделить в глобальные константы
     PERCENTAGE: 'PERCENTAGE',
     valueLabel: {
         ru: 'Значение',
