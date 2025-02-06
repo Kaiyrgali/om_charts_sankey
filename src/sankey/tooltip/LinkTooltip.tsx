@@ -10,11 +10,10 @@ import { defaultSettings } from '../constants'
 export const SankeyChartLinkTooltip = (props: TooltipProps) => {
     const {
         params: { data, position, type },
-        digitCapacity: { values } = defaultSettings.digitCapacityValue,
         showTooltip = defaultSettings.showLinkTooltip,
-        format,
         chartRef,
         colors,
+        numberFormatter,
     } = props
     const needTooltip = useMemo(() => some(showTooltip), [showTooltip])
 
@@ -30,10 +29,9 @@ export const SankeyChartLinkTooltip = (props: TooltipProps) => {
             position={position}
         >
             <LinkValue
-                format={format!}
+                numberFormatter={numberFormatter}
                 isShow={showTooltip.value}
                 value={value}
-                values={values}
                 color={colors?.linkText}
             />
 

@@ -34,7 +34,10 @@ function getCoordinate(
     position: NonNullable<Position>,
     tooltipRef: TooltipRef,
     chartRef: ChartRef,
-) {
+): {
+    left: number;
+    top: number;
+} {
     const { top = 0, bottom = 0, right = 0 } = chartRef.current?.getBoundingClientRect() || {}
     const { width = 0, height = 0 } = tooltipRef.current?.getBoundingClientRect() || {}
     const { x, y } = position
@@ -42,7 +45,7 @@ function getCoordinate(
     const tooltipLeft = x + width + OFFSET > right ? x - width - OFFSET : x + OFFSET
 
     const tooltipTop =
-        y + height + OFFSET > bottom ? max([top + OFFSET, y - height - OFFSET]) : y + OFFSET
+        y + height + OFFSET > bottom ? max([top + OFFSET, y - height - OFFSET]) || top : y + OFFSET
 
     return {
         left: tooltipLeft,

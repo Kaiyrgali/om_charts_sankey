@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Languages, NumberFormat } from '../types'
+import { Languages, NumberFormatter } from '../types'
 
 import { numberFormat } from '../../utils/utils'
 import { constants } from '../constants'
@@ -9,17 +9,15 @@ import styles from './Tooltip.module.css'
 
 interface Props {
     value: number
-    format: NumberFormat
-    values: string
     isShow: boolean
     lang?: Languages
     color?: string
+    numberFormatter?: NumberFormatter
 }
 
 export const LinkValue: React.FC<Props> = React.memo(function LinkValue({
     value,
-    format,
-    values,
+    numberFormatter,
     isShow,
     lang = Languages.RU,
     color,
@@ -28,7 +26,7 @@ export const LinkValue: React.FC<Props> = React.memo(function LinkValue({
         return null
     }
 
-    const formattedValue = numberFormat(format, value, values)
+    const formattedValue = numberFormat(value, numberFormatter)
     const linkText = `${constants.valueLabel[lang]}: ${formattedValue}`
 
     return (

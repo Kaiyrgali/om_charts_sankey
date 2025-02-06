@@ -37,8 +37,6 @@ export enum SankeyTypeTooltip {
 
 export interface Settings {
     needTooltip?: boolean
-    digitCapacity?: { values: DigitalCapacity }
-    format?: NumberFormat
     nodesSortingType?: SortingType
     linksSortingType?: SortingType
     colorMode?: ColorMode
@@ -48,7 +46,10 @@ export interface Settings {
     showLinkTooltip?: SankeyLinkTooltipType
     lang?: Languages
     tooltipColors?: TooltipColors
+    numberFormatter?: NumberFormatter
 }
+
+export type NumberFormatter = undefined | ((value: number) => string)
 
 export interface Text {
     showName: boolean
@@ -128,8 +129,7 @@ export type DataType = SankeyNode<Node, Link> | (Link & SankeyLinkMinimal<Node, 
 
 export interface TooltipProps {
     chartRef: React.RefObject<SVGSVGElement>
-    format?: NumberFormat
-    digitCapacity?: { values: string }
+    numberFormatter: NumberFormatter
     params: TooltipState
     showTooltip?: SankeyNodeTooltipType | SankeyLinkTooltipType
     colors?: TooltipColors 
@@ -156,17 +156,6 @@ export type SankeyLinkTooltipType = {
     sourcePercentage: boolean
     linkName: boolean
     linkPercentage: boolean
-}
-
-export interface NumberFormat {
-    dataType: 'NUMBER'
-    unitsType?: 'PERCENTAGE'
-}
-
-export enum DigitalCapacity {
-    NO = 'NO',
-    KILO = 'KILO',
-    MEGA = 'MEGA',
 }
 
 export const enum SortingType {

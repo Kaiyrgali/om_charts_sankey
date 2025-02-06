@@ -1,6 +1,7 @@
 import {
     sankey,
     sankeyCenter,
+    SankeyGraph,
     sankeyJustify,
     sankeyLeft,
     SankeyLink,
@@ -19,7 +20,6 @@ import {
     SortingLink,
     SortingType,
     Text,
-    DigitalCapacity,
     NodeSelection,
     RectSelection,
     LinkSelection,
@@ -34,8 +34,8 @@ import {
     LinkEventSelection,
     TooltipState,
     SankeyTypeTooltip,
+    NumberFormatter,
 } from '../sankey/types'
-import { NumberFormat } from '../sankey/types'
 import { Props as LinkSourcesProps } from '../sankey/tooltip/LinkSources'
 import { Props as NodeSourcesProps } from '../sankey/tooltip/NodeSources'
 
@@ -94,8 +94,7 @@ export const hasInvalidDatum = ({ links, nodes }: Datum) => {
 export const getText = (
     { name, value = 0 }: SankeyNode<Node, Link>,
     { showName, showValue }: Text,
-    { values }:  {values: DigitalCapacity},
-    format: NumberFormat,
+    numberFormatter: NumberFormatter,
 ): string => {
     if (!showName && !showValue) {
         return ''
@@ -105,7 +104,7 @@ export const getText = (
         return name
     }
 
-    const formattedValue = numberFormat(format, value, values)
+    const formattedValue = numberFormat(value, numberFormatter)
 
     return !showName ? formattedValue : `${name} (${formattedValue})`
 }
@@ -156,8 +155,7 @@ export const applyTextAttributes = (
     selection: LabelSelection,
     width: number,
     text: Text,
-    digitCapacity: { values: DigitalCapacity },
-    format: NumberFormat,
+    numberFormatter: NumberFormatter,
 ) => {
     ;(selection as TextSelection)
         .attr('class', styles.NodeLabel)
@@ -168,13 +166,16 @@ export const applyTextAttributes = (
         .attr('dy', '0.35em')
         .attr('text-anchor', ({ x0 = 0 }) => (x0 < width / 2 ? constants.START : constants.END))
         .each(function (data) {
-            const label = getText(data, text, digitCapacity, format)
+            const label = getText(data, text, numberFormatter)
 
             select(this).text(label).attr('data-name', getDataName(label))
         })
 }
 
-export const getSankeyData = (datum: Datum, sankeyGenerator: SankeyGenerator) => {
+export const getSankeyData = (
+    datum: Datum,
+    sankeyGenerator: SankeyGenerator
+): SankeyGraph<Node, Link> => {
     if (hasInvalidDatum(datum)) {
         return emptyDatum
     }
@@ -230,11 +231,11 @@ export const getLinkSourcesParams = ({ source, target, isShow }: LinkSourcesProp
 
 export const getNodeSourcesParams = (
     link: SankeyLink<Node, Link>,
-    { isShow, values, format, value }: NodeSourcesProps,
+    { isShow, value, numberFormatter }: NodeSourcesProps,
 ) => {
     const { incomeName, incomeValue, incomePercentage } = isShow
     const nameText = getNameText(incomeName, link.source as Node)
-    const valueText = getFormattedValue(incomeValue, format, link.value, values)
+    const valueText = getFormattedValue(incomeValue, link.value, numberFormatter)
     const percentageText = getPercentageText(incomeValue, incomePercentage, link, value)
     const separate = getSeparate(incomeName, incomeValue || incomePercentage)
 
@@ -246,11 +247,11 @@ export const getNodeSourcesParams = (
 
 export const getNodeTargetParams = (
     link: SankeyLink<Node, Link>,
-    { isShow, values, format, value }: NodeSourcesProps,
+    { isShow, value, numberFormatter }: NodeSourcesProps,
 ) => {
     const { outgoingName, outgoingValue, outgoingPercentage } = isShow
     const nameText = getNameText(outgoingName, link.target as Node)
-    const valueText = getFormattedValue(outgoingValue, format, link.value, values)
+    const valueText = getFormattedValue(outgoingValue, link.value, numberFormatter)
     const percentageText = getPercentageText(outgoingValue, outgoingPercentage, link, value)
     const separate = getSeparate(outgoingName, outgoingValue || outgoingPercentage)
 
@@ -266,11 +267,10 @@ const getSeparate = (needName: boolean, needValue: boolean) => {
 
 const getFormattedValue = (
     needFormat: boolean,
-    format: NumberFormat,
     value: number,
-    values: string,
+    numberFormatter: NumberFormatter,
 ) => {
-    return needFormat ? numberFormat(format, value, values) : ''
+    return needFormat ? numberFormat(value, numberFormatter) : ''
 }
 
 const getPercentageText = (
@@ -303,15 +303,14 @@ const getNameText = (needName: boolean, source: Node) => {
 }
 
 export const getNodeValueParams = (
-    format: NumberFormat,
-    values: string,
     name: string,
     isShow: SankeyNodeTooltipType,
     value = 0,
+    numberFormatter: NumberFormatter,
 ) => {
     const { name: isShowName, value: isShowValue } = isShow
     const nameText = isShowName ? name : ''
-    const valueText = getFormattedValue(isShowValue, format, value, values)
+    const valueText = getFormattedValue(isShowValue, value, numberFormatter)
     const separate = getSeparate(isShowName, isShowValue)
 
     return `${nameText}${separate}${valueText}`
@@ -346,12 +345,13 @@ export const addSankeyEventListeners = (
     link: LinkEventSelection,
     setTooltipState: React.Dispatch<React.SetStateAction<TooltipState>>,
     needTooltip: boolean,
+    signal: AbortSignal,
 ) => {
     if (!rect || !link) {
         return
     }
 
-    rect.on('mouseenter', (event, data) => {
+    rect.on('mouseenter', (event: MouseEvent, data: SankeyNode<Node, Link>) => {
         if (needTooltip) {
             setTooltipState({
                 data,
@@ -381,15 +381,15 @@ export const addSankeyEventListeners = (
                     }
                 }
             )
-    })
-        .on('mousemove', event => {
+    }, { signal })
+        .on('mousemove', (event: MouseEvent) => {
             if (needTooltip) {
                 setTooltipState(prev => ({
                     ...prev,
                     position: { x: event.pageX, y: event.pageY },
                 }))
             }
-        })
+        }, { signal })
         .on('mouseleave', () => {
             link.transition(hoverTransition()).style('stroke-opacity', constants.NORMAL_OPACITY)
 
@@ -400,9 +400,9 @@ export const addSankeyEventListeners = (
                     position: null,
                 }))
             }
-        })
+        }, { signal })
 
-    link.on('mouseenter', function (event, data) {
+    link.on('mouseenter', function (event: MouseEvent, data: SankeyLink<Node, Link>) {
         if (needTooltip) {
             setTooltipState({
                 data,
@@ -412,15 +412,15 @@ export const addSankeyEventListeners = (
         }
 
         select(this).transition(hoverTransition()).style('stroke-opacity', constants.HOVER_OPACITY)
-    })
-        .on('mousemove', event => {
+    }, { signal })
+        .on('mousemove', (event: MouseEvent) => {
             if (needTooltip) {
                 setTooltipState(prev => ({
                     ...prev,
                     position: { x: event.pageX, y: event.pageY },
                 }))
             }
-        })
+        }, { signal })
         .on('mouseleave', function () {
             if (needTooltip) {
                 setTooltipState(prev => ({
@@ -433,144 +433,9 @@ export const addSankeyEventListeners = (
             select(this)
                 .transition(hoverTransition())
                 .style('stroke-opacity', constants.NORMAL_OPACITY)
-        })
+        }, { signal })
 }
 
-export const destroySankeyEventListeners = (rect: RectSelection, link: LinkEventSelection) => {
-    if (!rect || !link) {
-        return
-    }
-
-    rect.on('mouseenter', null).on('mousemove', null).on('mouseleave', null)
-    link.on('mouseenter', null).on('mousemove', null).on('mouseleave', null)
+export function numberFormat(value: number, numberFormatter: NumberFormatter) {
+    return numberFormatter ? numberFormatter(value) : `${value}`
 }
-
-// TODO принимать форматирование аргументом
-export function numberFormat(format: NumberFormat, number: number, digitCapacityType: string) {
-
-    console.log(format, digitCapacityType)
-    return `${number}`
-    // if (!isNumber(number)) {
-    //     return null
-    // }
-
-    // if (!isNumberFormat(format)) {
-    //     return number
-    // }
-
-    // const { PERCENTAGE } = constants
-    // const isPercentage = format.unitsType === PERCENTAGE
-
-    // const absNumber = Math.abs(number)
-    // const isLessMillion = absNumber < 1000000
-    // const isLessThousand = absNumber < 1000
-
-    // const roundedMillion = isLessMillion
-    //     ? round(number / 1000000, 3)
-    //     : round(number / 1000000, 1)
-
-    // const roundedThousand = isLessThousand
-    //     ? round(number / 1000, 3)
-    //     : round(number / 1000, 1)
-
-    // if (digitCapacityType === DigitalCapacity.KILO) {
-    //     const symbol = isPercentage ? 'K %' : 'K'
-    //     const value = isPercentage ? round(roundedThousand * 100, 3) : roundedThousand
-
-    //     return `${formatSeparators(format, value)}${symbol}`
-    // }
-
-    // if (digitCapacityType === DigitalCapacity.MEGA) {
-    //     const symbol = isPercentage ? 'M %' : 'M'
-    //     const value = isPercentage ? round(roundedMillion * 100, 3) : roundedMillion
-
-    //     return `${formatSeparators(format, value)}${symbol}`
-    // }
-
-    // return this.formatter.format(format, number)
-}
-
-// function isNumberFormat(format?: NumberFormat): format is NumberFormat {
-//     return format?.dataType === 'NUMBER'
-// }
-
-// export const formatSeparators = (rules: NumberFormat, value: NumberValue): string => {
-//     const { decimal = '', integer } = parse(`${value}`)
-//     const { displayPercentagesInShares } = rules
-//     const maximumFractionDigits = 20
-//     const separators = {
-//         FULL_STOP: '.',
-//         COMMA: ',',
-//         SPACE: ' ',
-//         NONE: '',
-//     }
-//     const groupingSeparator = separators[rules.groupingSeparator]
-//     const decimalSeparator = separators[rules.decimalSeparator]
-
-//     let [leftSide, rightSide = ''] = parseFloat(`${integer}.${decimal}`)
-         
-//         .toLocaleString('ru-RU', {
-//             minimumFractionDigits:
-//                 decimal.length > maximumFractionDigits ? maximumFractionDigits : decimal.length,
-//         })
-//         .split(',')
-
-//     leftSide = leftSide.replace(
-//         /\s+/g,
-//         rules.groupingSeparator === 'NONE' ? '' : groupingSeparator || separators.COMMA,
-//     )
-
-//     if (
-//         rules.negativeNumberNotation === NegativeType.BRACKETS &&
-//         parseFloat(leftSide) < 0.9 &&
-//         leftSide !== '0'
-//     ) {
-//         leftSide = leftSide.replace('-', '')
-//         leftSide = `(${leftSide}${rightSide && decimalSeparator}${rightSide})`
-//         rightSide = ''
-//     }
-
-//     let result = [leftSide, rightSide].join(
-//         rightSide.length > 0 ? decimalSeparator || separators.FULL_STOP : '',
-//     )
-
-//     result = formatZeroFormat(rules, result)
-
-//     if (isPercentageFormat(rules) && !displayPercentagesInShares) {
-//         if (result == '-' || _.isEmpty(result)) {
-//             return result
-//         }
-
-//         return `${result}%`
-//     }
-
-//     if (!decimal.length || !_.size(decimalSeparator)) {
-//         return result
-//     }
-
-//     const { decimal: rightPart, integer: leftPart } = parse(result, decimalSeparator)
-
-//     if (rightPart) {
-//         const formattedRightPart = _.map(rightPart, (symbol, index) => {
-//             return decimal[index] || symbol
-//         })
-
-//         return `${leftPart}${decimalSeparator}${formattedRightPart.join('')}`
-//     }
-
-//     return result
-// }
-
-// const parse = (value: string, separator = '.') => {
-//     if (value.includes(separator)) {
-//         const decimal = _.last(value.split(separator))
-//         const [integer] = value.split(`${separator}${decimal}`)
-
-//         return { integer, decimal }
-//     }
-
-//     return {
-//         integer: value,
-//         decimal: '',
-//     }
-// }

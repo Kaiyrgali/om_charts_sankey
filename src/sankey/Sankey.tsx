@@ -12,7 +12,6 @@ import {
     applyRectAttributes,
     applyTextAttributes,
     createSankeyGenerator,
-    destroySankeyEventListeners,
     getAnimation,
     getSankeyData,
     hasInvalidDatum,
@@ -44,10 +43,9 @@ export const Sankey = ({
         nodesSortingType,
         linksSortingType,
         nodeAlign,
-        text = defaultSettings.text,
-        digitCapacity = defaultSettings.digitCapacityValue,
-        format = defaultSettings.format,
+        numberFormatter,
         colorMode,
+        text = defaultSettings.text,
         needTooltip = defaultSettings.needTooltip,
     } = settings
     const sankeyGenerator = useMemo(
@@ -78,6 +76,8 @@ export const Sankey = ({
     const animation = getAnimation(prevWidth.current, prevHeight.current, cardWidth, cardHeight)
 
     useEffect(() => {
+        const abortController = new AbortController()
+        const { signal } = abortController
         const container = svgRef.current
 
         if (!container) {
@@ -130,7 +130,7 @@ export const Sankey = ({
             .data(nodes)
             .join(
                 enter => enter.append('text').call(selection =>
-                    applyTextAttributes(selection, width, text, digitCapacity, format),),
+                    applyTextAttributes(selection, width, text, numberFormatter),),
                 update =>
                     update.call(currentSelection => {
                         currentSelection
@@ -140,20 +140,19 @@ export const Sankey = ({
                                     currentSelection,
                                     width,
                                     text,
-                                    digitCapacity,
-                                    format,
+                                    numberFormatter,
                                 ),)
                     }),
                 exit => exit.remove,
             )
 
-        addSankeyEventListeners(rect, link, setTooltipState, needTooltip)
+        addSankeyEventListeners(rect, link, setTooltipState, needTooltip, signal)
 
         prevWidth.current = cardWidth
         prevHeight.current = cardHeight
 
         return () => {
-            destroySankeyEventListeners(rect, link)
+            abortController.abort()
             setTooltipState({ type: null, data: null, position: null })
         }
     }, [
@@ -162,10 +161,9 @@ export const Sankey = ({
         sankeyData,
         animation,
         settings.colorMode,
-        settings.digitCapacity,
-        settings.format,
         settings.needTooltip,
         settings.text,
+        settings.numberFormatter,
     ])
 
     if (hasInvalidDatum(datum)) {
@@ -181,20 +179,18 @@ export const Sankey = ({
 
             <SankeyChartNodeTooltip
                 chartRef={svgRef}
-                digitCapacity={settings.digitCapacity}
-                format={settings.format}
                 params={tooltipState}
                 showTooltip={settings.showNodeTooltip}
                 colors={settings.tooltipColors}
+                numberFormatter={numberFormatter}
             />
 
             <SankeyChartLinkTooltip
                 chartRef={svgRef}
-                digitCapacity={settings.digitCapacity}
-                format={settings.format}
                 params={tooltipState}
                 showTooltip={settings.showLinkTooltip}
                 colors={settings.tooltipColors}
+                numberFormatter={numberFormatter}
             />
         </React.Fragment>
     )

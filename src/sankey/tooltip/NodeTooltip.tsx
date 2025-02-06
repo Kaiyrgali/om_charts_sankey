@@ -13,8 +13,7 @@ export const SankeyChartNodeTooltip: React.FC<TooltipProps> = props => {
         params: { data, position, type },
         showTooltip = defaultSettings.showNodeTooltip,
         chartRef,
-        digitCapacity: { values } = defaultSettings.digitCapacityValue,
-        format,
+        numberFormatter,
         colors,
     } = props
     const needTooltip = useMemo(() => some(showTooltip), [showTooltip])
@@ -33,29 +32,26 @@ export const SankeyChartNodeTooltip: React.FC<TooltipProps> = props => {
         >
             <NodeValue
                 color={color}
-                format={format!}
+                numberFormatter={numberFormatter!}
                 isShow={showTooltip as SankeyNodeTooltipType}
                 name={name}
                 value={value}
-                values={values}
             />
 
             <NodeSources
-                format={format!}
                 isShow={showTooltip as SankeyNodeTooltipType}
                 links={targetLinks}
                 value={value}
-                values={values}
                 color={colors?.incrementColor}
+                numberFormatter={numberFormatter}
             />
 
             <NodeTargets
-                format={format!}
                 isShow={showTooltip as SankeyNodeTooltipType}
                 links={sourceLinks}
                 value={value}
-                values={values}
                 color={colors?.decrementColor}
+                numberFormatter={numberFormatter}
             />
         </TooltipContainer>
     )

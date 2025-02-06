@@ -1,6 +1,6 @@
 import { SankeyNode, SankeyLink } from 'd3-sankey'
 
-import { Node, Link, DigitalCapacity, Languages, SortingType, ColorMode, NodeAlign } from '../types'
+import { Node, Link, Languages, SortingType, ColorMode, NodeAlign } from '../types'
 
 type SortType = SankeyNode<Node, Link> | SankeyLink<Node, Link>
 
@@ -40,7 +40,6 @@ export const constants = {
 
 export const defaultSettings = {
     needTooltip: false,
-    digitCapacityValue : { values: DigitalCapacity.NO }, // возможно это не нужно
     nodesSortingType: SortingType.NONE,
     linksSortingType: SortingType.NONE,
     colorMode: ColorMode.SOURCE,
@@ -67,10 +66,6 @@ export const defaultSettings = {
         linkPercentage: false,
     },
     lang: Languages.RU,
-    format: {
-        dataType: 'NUMBER',
-        unitsType: 'PERCENTAGE',
-    }, // возможно это не нужно
     tooltipColors: {
         labels: '#212121', // var(--primary-text-color)
     },
