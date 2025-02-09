@@ -1,5 +1,5 @@
 {
-  "name": "sankey",
+  "name": "om_charts_sankey",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -8,6 +8,7 @@
   ],
   "main": "./dist/sankey.umd.cjs",
   "module": "./dist/sankey.js",
+  "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/sankey.js",
@@ -19,10 +20,12 @@
     "start": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint src",
-    "lint:fix": "eslint 'src/**/*.{ts,tsx}' --fix",
-    "preview": "vite preview"
+    "lint:fix": "eslint src/**/*.{ts,tsx} --fix",
+    "preview": "vite preview",
+    "prepare": "husky"
   },
   "dependencies": {
+    "@hugojosefson/color-hash": "^2.0.3",
     "d3": "7.9.0",
     "d3-sankey": "0.12.3",
     "lodash": "4.17.21",
@@ -51,9 +54,11 @@
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.16",
     "globals": "^15.14.0",
+    "husky": "^9.1.7",
     "prettier": "3.4.2",
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.18.2",
-    "vite": "6.0.5"
+    "vite": "6.0.5",
+    "vite-plugin-dts": "^4.5.0"
   }
 }

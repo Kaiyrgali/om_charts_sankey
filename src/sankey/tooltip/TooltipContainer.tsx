@@ -4,7 +4,7 @@ import styles from './Tooltip.module.css'
 import { useTooltipCoordinate } from '../../hooks/useTooltipCoordinate'
 
 interface Props {
-        chartRef : React.RefObject<SVGSVGElement>,
+    chartRef : React.RefObject<SVGSVGElement>,
     position: { x: number; y: number } | null
     children: (JSX.Element | null)[] | JSX.Element | null
 }

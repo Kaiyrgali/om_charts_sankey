@@ -28,6 +28,11 @@
       "noFallthroughCasesInSwitch": true,
       "noUncheckedIndexedAccess": true, // ✅ Добавляет защиту при работе с массивами/объектами
       "noUncheckedSideEffectImports": true,
+
+      "declaration": true,
+      "declarationDir": "dist/types",
+      "emitDeclarationOnly": true,
+      "outDir": "dist",
     },
     "include": ["src"],
     "exclude": ["node_modules", "dist"]

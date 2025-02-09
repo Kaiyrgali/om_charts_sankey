@@ -12,16 +12,24 @@ import { Transition } from 'd3-transition'
 export type CustomSankeyNode = Node & Required<SankeyNodeMinimal<Node, Link>>
 export type CustomSankeyLink = Link & Required<SankeyLinkMinimal<Node, Link>>
 
-export interface Node {
+export interface BaseNode {
     name: string
-    color: string
-    entityLongId: number
+    color?: string
 }
 
 export interface Link {
     source: string
     target: string
     value: number
+}
+
+export interface SankeyDatum {
+    nodes: BaseNode[]
+    links: Link[]
+}
+
+export interface Node extends BaseNode {
+    color: string;
 }
 
 export interface Datum {
@@ -35,16 +43,16 @@ export enum TooltipType {
 }
 
 export interface Settings {
+    colorMode?: ColorMode
+    lang?: Languages
+    nodeAlign?: NodeAlign
     needTooltip?: boolean
     nodesSortingType?: SortingType
     linksSortingType?: SortingType
-    colorMode?: ColorMode
-    text?: Text
-    nodeAlign?: NodeAlign
-    showNodeTooltip?: SankeyNodeTooltipType
     showLinkTooltip?: SankeyLinkTooltipType
-    lang?: Languages
+    showNodeTooltip?: SankeyNodeTooltipType
     tooltipColors?: TooltipColors
+    text?: Text
     numberFormatter?: NumberFormatter
 }
 
@@ -80,13 +88,28 @@ export enum ColorMode {
     TARGET = 'target',
 }
 
-type RectTransition = Transition<SVGRectElement, SankeyNode<Node, Link>, BaseType, unknown>
+type RectTransition = Transition<
+    SVGRectElement,
+    SankeyNode<Node, Link>,
+    BaseType,
+    unknown
+>
 
-export type RectSelection = Selection<SVGRectElement, SankeyNode<Node, Link>, BaseType, unknown>
+export type RectSelection = Selection<
+    SVGRectElement,
+    SankeyNode<Node, Link>,
+    BaseType,
+    unknown
+>
 
 export type NodeSelection = RectSelection | RectTransition
 
-type PathTransition = Transition<BaseType, SankeyLink<Node, Link>, BaseType, unknown>
+type PathTransition = Transition<
+    BaseType,
+    SankeyLink<Node, Link>,
+    BaseType,
+    unknown
+>
 
 export type LinkEventSelection = Selection<
     BaseType | SVGPathElement,
@@ -129,7 +152,7 @@ export interface TooltipProps {
     chartRef: React.RefObject<SVGSVGElement>
     numberFormatter: NumberFormatter
     params: TooltipState
-    showTooltip?: SankeyNodeTooltipType | SankeyLinkTooltipType
+    showTooltip: SankeyNodeTooltipType | SankeyLinkTooltipType
     colors?: TooltipColors 
 }
 
@@ -162,3 +185,11 @@ export const enum SortingType {
     DESC = 'descending',
 }
 
+export interface ChartDimensions {
+    width?: number
+    height?: number
+}
+
+export type DefaultSettings =
+    Required<Omit<Settings, 'tooltipColors' | 'numberFormatter'>> &
+    Required<ChartDimensions>

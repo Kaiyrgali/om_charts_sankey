@@ -1,3 +1,4 @@
+import React from 'react'
 import {
     sankey,
     sankeyCenter,
@@ -10,8 +11,9 @@ import {
     SankeyNode,
     sankeyRight,
 } from 'd3-sankey'
+import { Property } from 'csstype'
 
-import { constants, defaultSettings } from '../sankey/constants'
+import { constants } from '../sankey/constants'
 import {
     Datum,
     Link,
@@ -19,7 +21,6 @@ import {
     NodeAlign,
     SortingNode,
     SortingLink,
-    SortingType,
     Text,
     NodeSelection,
     RectSelection,
@@ -36,6 +37,8 @@ import {
     TooltipState,
     TooltipType,
     NumberFormatter,
+    SortingType,
+    SankeyDatum,
 } from '../sankey/types'
 import { Props as LinkSourcesProps } from '../sankey/tooltip/LinkSources'
 import { Props as NodeSourcesProps } from '../sankey/tooltip/NodeSources'
@@ -47,6 +50,9 @@ import assign from 'lodash/assign'
 import map from 'lodash/map'
 import round from 'lodash/round'
 import { interpolateNumber, Transition, transition } from 'd3'
+import memoize from 'lodash/memoize'
+// @ts-expect-error Отсутствуют типы для @hugojosefson/color-hash
+import ColorHash from '@hugojosefson/color-hash'
 
 function getNodeAlign(value: NodeAlign): (node: SankeyNode<object, object>, n: number) => number {
     const { CENTER, LEFT, RIGHT } = NodeAlign
@@ -64,11 +70,11 @@ function getNodeAlign(value: NodeAlign): (node: SankeyNode<object, object>, n: n
 }
 
 export const createSankeyGenerator = (
-    nodesSortingType: SortingType = defaultSettings.nodesSortingType,
-    linksSortingType: SortingType = defaultSettings.linksSortingType,
-    nodeAlign: NodeAlign = defaultSettings.nodeAlign,
-    cardWidth: number = defaultSettings.width,
-    cardHeight: number = defaultSettings.height,
+    nodesSortingType: SortingType,
+    linksSortingType: SortingType,
+    nodeAlign: NodeAlign,
+    cardWidth: number,
+    cardHeight: number,
 ): SankeyLayout<SankeyGraph<Node, Link>, Node, Link> => {
     const {
         NODE_WIDTH,
@@ -93,11 +99,11 @@ export const hasInvalidDatum = ({ links, nodes }: Datum): boolean => {
 }
 
 export const getText = (
-    { name, value = 0 }: SankeyNode<Node, Link>,
+    { name, value }: SankeyNode<Node, Link>,
     { showName, showValue }: Text,
     numberFormatter: NumberFormatter,
 ): string => {
-    if (!showName && !showValue) {
+    if ((!showName && !showValue) || !value) {
         return ''
     }
 
@@ -206,10 +212,10 @@ export const getLinkSourcesText = (
 
 export const getLinkSourcesParams = ({ source, target, isShow }: LinkSourcesProps): {
     sourceName: string;
-    sourceColor: string;
+    sourceColor: Property.Color | undefined;
     sourceText: string;
     targetName: string;
-    targetColor: string;
+    targetColor: Property.Color | undefined;
     targetText: string;
 } => {
     const { name: sourceName, value: sourceValue, color: sourceColor } = source as CustomSankeyNode
@@ -454,3 +460,41 @@ export const addSankeyEventListeners = (
 export function numberFormat(value: number, numberFormatter: NumberFormatter): string {
     return numberFormatter ? numberFormatter(value) : `${value}`
 }
+
+export const createDatum = (incomingDatum: SankeyDatum): Datum => {
+    const links = getLinks(incomingDatum)
+    const nodes = getNodes(incomingDatum)
+    
+    return {
+        nodes,
+        links,
+    }
+}
+
+const getLinks = ({links}: SankeyDatum): Link[] => {
+    return links.filter(({ value }) => {
+        return Number.isFinite(value) && value > 0
+    })
+}
+
+const getNodes = ({nodes}: SankeyDatum): Node[] => {
+    return nodes.map(({ name, color }, index) => {
+        return {
+            name,
+            color: color || getColor(index)
+        }
+    })
+}
+
+const colorHash = new ColorHash()
+
+const getColor = memoize((index: number): string => {
+    if (typeof index === 'undefined') {
+        return '#000'
+    }
+
+    const string = index.toString()
+
+    return colorHash.hex(string + string.repeat(index))
+})
+

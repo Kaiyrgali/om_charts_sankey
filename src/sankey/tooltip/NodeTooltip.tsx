@@ -5,13 +5,12 @@ import { NodeSources } from './NodeSources'
 import { NodeTargets } from './NodeTargets'
 import { NodeValue } from './NodeValue'
 import { TooltipContainer } from './TooltipContainer'
-import { defaultSettings } from '../constants'
 import { needSkipTooltip } from '../../utils/utils'
 
 export const SankeyChartNodeTooltip: React.FC<TooltipProps> = props => {
     const {
         params: { data, position, type },
-        showTooltip = defaultSettings.showNodeTooltip,
+        showTooltip,
         chartRef,
         numberFormatter,
         colors,

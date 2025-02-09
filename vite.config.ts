@@ -1,6 +1,7 @@
 import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath } from 'node:url'    
 import { defineConfig } from 'vite'
+import dts from 'vite-plugin-dts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -9,6 +10,11 @@ import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 export default defineConfig({
     plugins: [
         cssInjectedByJsPlugin(),
+        dts({
+            outDir: 'dist/types',
+            insertTypesEntry: true,
+            staticImport: true,
+        }),
     ],
     build: {
         lib: {

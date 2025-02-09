@@ -11,14 +11,16 @@ import {
     applyLinkAttributes,
     applyRectAttributes,
     applyTextAttributes,
+    createDatum,
     createSankeyGenerator,
     getAnimation,
     getSankeyData,
     hasInvalidDatum,
 } from '../utils/utils'
 import {
+    ChartDimensions,
     CustomSankeyNode,
-    Datum,
+    SankeyDatum,
     Settings,
     SVG,
     TooltipState,
@@ -27,27 +29,34 @@ import {
 import styles from './Sankey.module.css'
 
 interface Props {
-    datum: Datum
-    width: number
-    height: number
+    datum: SankeyDatum
+    width: ChartDimensions['width']
+    height: ChartDimensions['height']
     settings: Settings
 }
 
 export const Sankey = ({
-    datum,
-    width: cardWidth,
-    height: cardHeight,
+    datum: incomingDatum,
+    width: cardWidth = defaultSettings.width,
+    height: cardHeight = defaultSettings.height,
     settings,
 }: Props): JSX.Element | null => {
     const {
         nodesSortingType,
         linksSortingType,
         nodeAlign,
-        numberFormatter,
         colorMode,
-        text = defaultSettings.text,
-        needTooltip = defaultSettings.needTooltip,
-    } = settings
+        needTooltip,
+        text,
+        showNodeTooltip,
+        showLinkTooltip,
+        tooltipColors,
+        numberFormatter,
+    } = { ...defaultSettings, ...settings }
+    const datum = useMemo(
+        () => createDatum(incomingDatum),
+        [incomingDatum],
+    )
     const sankeyGenerator = useMemo(
         () =>
             createSankeyGenerator(
@@ -59,11 +68,9 @@ export const Sankey = ({
             ),
         [nodesSortingType, linksSortingType, nodeAlign, cardWidth, cardHeight],
     )
-
     const sankeyData = useMemo(() => {
         return getSankeyData(datum, sankeyGenerator)
     }, [datum, sankeyGenerator])
-
     const [tooltipState, setTooltipState] = useState<TooltipState>({
         type: null,
         data: null,
@@ -160,10 +167,10 @@ export const Sankey = ({
         cardHeight,
         sankeyData,
         animation,
-        settings.colorMode,
-        settings.needTooltip,
-        settings.text,
-        settings.numberFormatter,
+        colorMode,
+        needTooltip,
+        text,
+        numberFormatter,
     ])
 
     if (hasInvalidDatum(datum)) {
@@ -180,16 +187,16 @@ export const Sankey = ({
             <SankeyChartNodeTooltip
                 chartRef={svgRef}
                 params={tooltipState}
-                showTooltip={settings.showNodeTooltip}
-                colors={settings.tooltipColors}
+                showTooltip={showNodeTooltip}
+                colors={tooltipColors}
                 numberFormatter={numberFormatter}
             />
 
             <SankeyChartLinkTooltip
                 chartRef={svgRef}
                 params={tooltipState}
-                showTooltip={settings.showLinkTooltip}
-                colors={settings.tooltipColors}
+                showTooltip={showLinkTooltip}
+                colors={tooltipColors}
                 numberFormatter={numberFormatter}
             />
         </React.Fragment>

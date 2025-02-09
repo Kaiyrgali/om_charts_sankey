@@ -1,118 +1,92 @@
-import { Datum } from "../sankey/types";
+import { SankeyDatum } from "../sankey/types";
 
-export const chartData = {
+export const chartData: SankeyDatum = {
     "nodes": [
         {
             "name": "Сдача помещений в аренду",
-            "color": "#79a4d2",
-            "entityLongId": 206000000004
         },
         {
             "name": "Выручка",
-            "color": "#40bf4d",
-            "entityLongId": 206000000002
         },
         {
             "name": "Оказание услуг",
-            "color": "#3a7872",
-            "entityLongId": 206000000005
         },
         {
             "name": "Реализация продукции",
-            "color": "#40b5bf",
-            "entityLongId": 206000000003
         },
         {
             "name": "Займы",
-            "color": "#611f93",
-            "entityLongId": 206000000006
         },
         {
             "name": "Поступления",
-            "color": "#87c0c5",
-            "entityLongId": 206000000001
         },
         {
             "name": "Расходы",
             "color": "#93211f",
-            "entityLongId": 206000000007
         },
         {
             "name": "Коммерческие",
             "color": "#931f59",
-            "entityLongId": 206000000012
         },
         {
             "name": "Производственные",
             "color": "#6c6ce0",
-            "entityLongId": 206000000008
         },
         {
             "name": "Управленческие",
             "color": "#bf4088",
-            "entityLongId": 206000000016
         },
         {
             "name": "Реклама",
             "color": "#8dd22d",
-            "entityLongId": 206000000014
         },
         {
             "name": "Командировочные",
             "color": "#cad22d",
-            "entityLongId": 206000000015
         },
         {
             "name": "Заработная плата менеджеров",
             "color": "#c58d87",
-            "entityLongId": 206000000013
         },
         {
             "name": "Заработная плата рабочих",
             "color": "#93501f",
-            "entityLongId": 206000000010
         },
         {
             "name": "Уплата % по кредитам",
             "color": "#ac539c",
-            "entityLongId": 206000000011
         },
         {
             "name": "Приобретение сырья, материалов",
             "color": "#78503a",
-            "entityLongId": 206000000009
         },
         {
             "name": "Заработная плата администрации",
             "color": "#d2799a",
-            "entityLongId": 206000000018
         },
         {
             "name": "Обучение персонала",
             "color": "#57bf40",
-            "entityLongId": 206000000019
         },
         {
             "name": "Аренда офисных помещений",
             "color": "#3a7862",
-            "entityLongId": 206000000017
         },
         {
             "name": "Прибыль",
             "color": "#49783a",
-            "entityLongId": 206000000020
         }
     ],
     "links": [
         {
             "source": "Сдача помещений в аренду",
             "target": "Выручка",
-            "value": 400
+            "value": 1000
         },
         {
             "source": "Оказание услуг",
             "target": "Выручка",
-            "value": 330
+            "value": 300
         },
         {
             "source": "Реализация продукции",
@@ -200,4 +174,4 @@ export const chartData = {
             "value": 1100
         }
     ]
-} as Datum
+}

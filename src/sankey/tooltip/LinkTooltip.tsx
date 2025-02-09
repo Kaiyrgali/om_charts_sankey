@@ -6,12 +6,11 @@ import { Link, SankeyLinkTooltipType, TooltipType, TooltipProps } from '../types
 import { LinkSources } from './LinkSources'
 import { LinkValue } from './LinkValue'
 import { TooltipContainer } from './TooltipContainer'
-import { defaultSettings } from '../constants'
 
 export const SankeyChartLinkTooltip = (props: TooltipProps): React.ReactElement | null => {
     const {
         params: { data, position, type },
-        showTooltip = defaultSettings.showLinkTooltip,
+        showTooltip,
         chartRef,
         colors,
         numberFormatter,

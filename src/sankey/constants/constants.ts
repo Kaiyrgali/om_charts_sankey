@@ -1,6 +1,6 @@
 import { SankeyNode, SankeyLink } from 'd3-sankey'
 
-import { Node, Link, Languages, SortingType, ColorMode, NodeAlign } from '../types'
+import { Node, Link, Languages, SortingType, ColorMode, NodeAlign, DefaultSettings } from '../types'
 
 type SortType = SankeyNode<Node, Link> | SankeyLink<Node, Link>
 
@@ -37,16 +37,20 @@ export const constants = {
     }
 }
 
-export const defaultSettings = {
+export const defaultSettings: DefaultSettings = {
+    colorMode: ColorMode.SOURCE,
+    lang: Languages.RU,
+    nodeAlign: NodeAlign.JUSTIFY,
     needTooltip: false,
     nodesSortingType: SortingType.NONE,
     linksSortingType: SortingType.NONE,
-    colorMode: ColorMode.SOURCE,
-    text: {
-        showName: false,
-        showValue: false,
+    showLinkTooltip: {
+        value: false,
+        sourceName: false,
+        sourcePercentage: false,
+        linkName: false,
+        linkPercentage: false,
     },
-    nodeAlign: NodeAlign.JUSTIFY,
     showNodeTooltip: {
         name: false,
         value: false,
@@ -57,16 +61,9 @@ export const defaultSettings = {
         outgoingValue: false,
         outgoingPercentage: false,
     },
-    showLinkTooltip: {
-        value: false,
-        sourceName: false,
-        sourcePercentage: false,
-        linkName: false,
-        linkPercentage: false,
-    },
-    lang: Languages.RU,
-    tooltipColors: {
-        labels: '#212121', // var(--primary-text-color)
+    text: {
+        showName: false,
+        showValue: false,
     },
     height: 500,
     width: 900,
