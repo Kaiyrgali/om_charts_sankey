@@ -6,8 +6,8 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-sankey-0.0.0.tgz
 
+*.tgz
 node_modules
 dist
 dist-ssr

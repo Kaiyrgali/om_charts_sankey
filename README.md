@@ -40,17 +40,18 @@ const data: SankeyDatum = {
 }
 
 const setting: Settings = {
-	...
-	needTooltip: true,
+  ...
+  needTooltip: true,
 }
 
 const App = () => {
   return (
-      <Sankey
-			datum={data}
-			setting={setting}
-			width={600}
-			height={400} />
+    <Sankey
+	  datum={data}
+	  setting={setting}
+	  width={600}
+	  height={400}
+    />
   )
 }
 
@@ -119,13 +120,14 @@ const data = {
 | `showNodeTooltip`  | Объект                                                                       | См. ниже         | Настройки тултипов для узлов.                                                                          |
 | `tooltipColors`    | Объект                                                                       | См. ниже         | Цвета тултипов.                                                                                        |
 | `text`             | Объект                                                                       | См. ниже         | Настройки отображения текста.                                                                          |
-
+| `numberFormatter`  | Функция                                                                      | См. ниже         | Преобразует числа в пользовательское представление                                                     |
+|
 #### `showLinkTooltip`
 Данная настройка определяет внешний вид тултипа при наведении на линии связи между узлами
 
 #### Внешний вид тултипа
 
-![SankeyChart](img/linkTooltip.png)
+![linkTooltip](img/linkTooltip.png)
 
 | Свойство           | Тип        | По умолчанию | Описание                      |
 | ------------------ | ---------- | ------------ | ----------------------------- |
@@ -139,7 +141,7 @@ const data = {
 
 Данная настройка определяет внешний вид тултипа при наведении на  узлы
 
-![SankeyChart](img/nodeTooltip.png)
+![nodeTooltip](img/nodeTooltip.png)
 
 | Свойство             | Тип        | По умолчанию | Описание                             |
 | -------------------- | ---------- | ------------ | ------------------------------------ |
@@ -155,13 +157,23 @@ const data = {
 
 | Свойство         | Тип    | По умолчанию | Описание                              |
 | ---------------- | ------ | ------------ | ------------------------------------- |
-| `labels`         | строка | #010409      | Цвет основного значения тултипа узла  |
-| `linkText`       | строка | #212121      | Цвет основного значения тултипа связи |
-| `decrementColor` | строка | #B22222      | Цвет входящих исходящих тултипа связи |
-| `incrementColor` | строка | #228B22      | Цвет входящих значений тултипа связи  |
+| `labels`         | строка |<span style="display:inline-block;width:15px;height:15px;background-color:#010409;margin-right:5px;"></span> `#010409`| Цвет основного значения тултипа узла  |
+| `linkText`       | строка |<span style="display:inline-block;width:15px;height:15px;background-color:#212121;margin-right:5px;"></span> `#212121`| Цвет основного значения тултипа связи |
+| `decrementColor` | строка |<span style="display:inline-block;width:15px;height:15px;background-color:#B22222;margin-right:5px;"></span> `#B22222`| Цвет входящих исходящих тултипа связи |
+| `incrementColor` | строка |<span style="display:inline-block;width:15px;height:15px;background-color:#228B22;margin-right:5px;"></span> `#228B22`| Цвет входящих значений тултипа связи  |
+
 #### `text`
 
 | Свойство    | Тип        | По умолчанию | Описание                  |
 | ----------- | ---------- | ------------ | ------------------------- |
 | `showName`  | Логический | `false`      | Показывать имя узла.      |
 | `showValue` | Логический | `false`      | Показывать значение узла. |
+
+#### `numberFormatter`
+
+Функция пользовательского форматирования чисел, которые будут отражаться на графике и тултипах.  Дефолтно значения будут отображаться без разделителей тысячных и каких либо префиксов
+```ts
+numberFormatte: (value: number) => string
+```
+
+![formatter](img/numberFormatter.png)
