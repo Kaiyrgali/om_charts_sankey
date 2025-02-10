@@ -1,11 +1,10 @@
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { easeSinOut } from 'd3'
 import { select } from 'd3-selection'
 import { transition } from 'd3-transition'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
 
 import { defaultSettings } from './constants'
-import { SankeyChartLinkTooltip } from './tooltip/LinkTooltip'
-import { SankeyChartNodeTooltip } from './tooltip/NodeTooltip'
+import { LinkTooltip, NodeTooltip } from './tooltip'
 import {
     addSankeyEventListeners,
     applyLinkAttributes,
@@ -16,7 +15,7 @@ import {
     getAnimation,
     getSankeyData,
     hasInvalidDatum,
-} from '../utils/utils'
+} from 'utils'
 import {
     ChartDimensions,
     CustomSankeyNode,
@@ -184,7 +183,7 @@ export const Sankey = ({
                 ref={svgRef}
             />
 
-            <SankeyChartNodeTooltip
+            <NodeTooltip
                 chartRef={svgRef}
                 params={tooltipState}
                 showTooltip={showNodeTooltip}
@@ -192,7 +191,7 @@ export const Sankey = ({
                 numberFormatter={numberFormatter}
             />
 
-            <SankeyChartLinkTooltip
+            <LinkTooltip
                 chartRef={svgRef}
                 params={tooltipState}
                 showTooltip={showLinkTooltip}

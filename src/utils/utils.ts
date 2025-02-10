@@ -1,4 +1,5 @@
-import React from 'react'
+import { interpolateNumber, Transition, transition } from 'd3'
+import { BaseType, select } from 'd3-selection'
 import {
     sankey,
     sankeyCenter,
@@ -11,8 +12,15 @@ import {
     SankeyNode,
     sankeyRight,
 } from 'd3-sankey'
-import { Property } from 'csstype'
+import replace from 'lodash/replace'
+import assign from 'lodash/assign'
+import map from 'lodash/map'
+import round from 'lodash/round'
+import memoize from 'lodash/memoize'
+// @ts-expect-error Отсутствуют типы для @hugojosefson/color-hash
+import ColorHash from '@hugojosefson/color-hash'
 
+import { Property } from 'csstype'
 import { constants } from '../sankey/constants'
 import {
     Datum,
@@ -44,15 +52,6 @@ import { Props as LinkSourcesProps } from '../sankey/tooltip/LinkSources'
 import { Props as NodeSourcesProps } from '../sankey/tooltip/NodeSources'
 
 import styles from '../sankey/Sankey.module.css'
-import { BaseType, select } from 'd3-selection'
-import replace from 'lodash/replace'
-import assign from 'lodash/assign'
-import map from 'lodash/map'
-import round from 'lodash/round'
-import { interpolateNumber, Transition, transition } from 'd3'
-import memoize from 'lodash/memoize'
-// @ts-expect-error Отсутствуют типы для @hugojosefson/color-hash
-import ColorHash from '@hugojosefson/color-hash'
 
 function getNodeAlign(value: NodeAlign): (node: SankeyNode<object, object>, n: number) => number {
     const { CENTER, LEFT, RIGHT } = NodeAlign

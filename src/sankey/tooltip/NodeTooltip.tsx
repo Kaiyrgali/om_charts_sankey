@@ -1,13 +1,14 @@
 import React, { useMemo } from 'react'
 import some from 'lodash/some'
+
 import { CustomSankeyNode, SankeyNodeTooltipType, TooltipType, TooltipProps } from '../types'
 import { NodeSources } from './NodeSources'
 import { NodeTargets } from './NodeTargets'
 import { NodeValue } from './NodeValue'
 import { TooltipContainer } from './TooltipContainer'
-import { needSkipTooltip } from '../../utils/utils'
+import { needSkipTooltip } from 'utils'
 
-export const SankeyChartNodeTooltip: React.FC<TooltipProps> = props => {
+export const NodeTooltip = (props: TooltipProps): React.ReactElement | null => {
     const {
         params: { data, position, type },
         showTooltip,

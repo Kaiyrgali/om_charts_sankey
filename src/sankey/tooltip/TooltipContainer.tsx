@@ -1,7 +1,8 @@
 import React, { useRef } from 'react'
 
+import { useTooltipCoordinate } from 'hooks'
+
 import styles from './Tooltip.module.css'
-import { useTooltipCoordinate } from '../../hooks/useTooltipCoordinate'
 
 interface Props {
     chartRef : React.RefObject<SVGSVGElement>,

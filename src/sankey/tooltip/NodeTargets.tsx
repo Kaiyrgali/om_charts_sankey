@@ -1,8 +1,9 @@
 import React from 'react'
+
+import { getNodeTargetParams } from 'utils'
 import { Props } from './NodeSources'
 
 import styles from './Tooltip.module.css'
-import { getNodeTargetParams } from '../../utils/utils'
 
 export const NodeTargets = React.memo(function NodeTargets(props: Props) {
     const { isShow, links, color } = props

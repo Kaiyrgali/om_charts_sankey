@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { Link, Node, NumberFormatter, SankeyNodeTooltipType } from '../types'
-import { getNodeSourcesParams } from '../../utils/utils'
+import { getNodeSourcesParams } from 'utils'
 import { SankeyLink } from 'd3-sankey'
 
 import styles from './Tooltip.module.css'

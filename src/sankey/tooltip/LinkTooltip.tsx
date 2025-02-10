@@ -1,13 +1,13 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { SankeyLinkMinimal } from 'd3-sankey'
-import { useMemo } from 'react'
 import some from 'lodash/some'
+
 import { Link, SankeyLinkTooltipType, TooltipType, TooltipProps } from '../types'
 import { LinkSources } from './LinkSources'
 import { LinkValue } from './LinkValue'
 import { TooltipContainer } from './TooltipContainer'
 
-export const SankeyChartLinkTooltip = (props: TooltipProps): React.ReactElement | null => {
+export const LinkTooltip = (props: TooltipProps): React.ReactElement | null => {
     const {
         params: { data, position, type },
         showTooltip,

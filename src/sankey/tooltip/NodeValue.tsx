@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { NumberFormatter, SankeyNodeTooltipType } from '../types'
-import { getNodeValueParams } from '../../utils/utils'
+import { getNodeValueParams } from 'utils'
 
 interface Props {
     color: string

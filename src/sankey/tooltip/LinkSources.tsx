@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { LinkSource, SankeyLinkTooltipType } from '../types'
-import { getLinkSourcesParams } from '../../utils/utils'
+import { getLinkSourcesParams } from 'utils'
 
 export interface Props {
     source: LinkSource

@@ -1,8 +1,7 @@
 import React from 'react'
 
 import { Languages, NumberFormatter } from '../types'
-
-import { numberFormat } from '../../utils/utils'
+import { numberFormat } from 'utils'
 import { constants } from '../constants'
 
 import styles from './Tooltip.module.css'
